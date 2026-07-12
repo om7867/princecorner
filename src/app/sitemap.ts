@@ -10,9 +10,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     ...VENUES.map((venue) => ({
-      url: `${SITE.url}/venue/${venue.slug}`,
+      url: `${SITE.url}/${venue.slug}`,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
+    {
+      url: `${SITE.url}/menu`,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    },
+    {
+      url: `${SITE.url}/reserve`,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    },
   ];
 }

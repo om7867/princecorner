@@ -46,12 +46,15 @@ export function SiteNavbar() {
     setJustDismissed(true);
   }
 
+  // each world's accent tints the active pill — you know which room you're
+  // in before its 3D scene even finishes loading
   const links = [
     ...VENUES.map((v) => ({
-      href: `/venue/${v.slug}`,
+      href: `/${v.slug}`,
       label: v.name.replace("The ", ""),
+      accent: v.accent,
     })),
-    { href: "/#menu", label: "Menu" },
+    { href: "/menu", label: "Menu", accent: "#e7a73a" },
   ];
 
   return (
@@ -111,9 +114,10 @@ export function SiteNavbar() {
                 key={link.href}
                 href={link.href}
                 aria-current={isActive ? "page" : undefined}
+                style={isActive ? { backgroundColor: link.accent } : undefined}
                 className={`rounded-full px-4 py-1.5 font-body text-sm font-medium transition-colors duration-300 ease-[var(--ease-cubic)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron ${
                   isActive
-                    ? "bg-saffron text-espresso"
+                    ? "text-espresso"
                     : "text-linen/85 hover:bg-linen/10 hover:text-linen"
                 }`}
               >
@@ -122,8 +126,13 @@ export function SiteNavbar() {
             );
           })}
           <Link
-            href="/#reservation"
-            className="ml-1 rounded-full bg-terracotta px-4 py-1.5 font-body text-sm font-semibold text-linen transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
+            href="/reserve"
+            aria-current={pathname === "/reserve" ? "page" : undefined}
+            className={`ml-1 rounded-full px-4 py-1.5 font-body text-sm font-semibold transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron ${
+              pathname === "/reserve"
+                ? "bg-saffron text-espresso"
+                : "bg-terracotta text-linen"
+            }`}
           >
             Reserve
           </Link>
@@ -179,7 +188,7 @@ export function SiteNavbar() {
             ))}
             <li>
               <Link
-                href="/#reservation"
+                href="/reserve"
                 onClick={() => setOpen(false)}
                 className="mt-1 block rounded-xl bg-terracotta px-4 py-3 text-center font-body text-sm font-semibold text-linen"
               >

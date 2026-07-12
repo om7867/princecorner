@@ -35,7 +35,7 @@ export const SITE = {
   /** Set to null to hide the offer banner. Editable in one line — that's the pitch. */
   announcement: {
     text: "This week — live jazz Thursday 8pm · Golden hour Fri 5–7pm: half-price spritzes",
-    href: "/venue/bar",
+    href: "/bar",
     label: "See what's on",
   } as { text: string; href: string; label: string } | null,
 

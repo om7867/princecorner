@@ -27,7 +27,7 @@ export function VenueGrid() {
           {VENUES.map((venue) => (
             <li key={venue.slug}>
               <Link
-                href={`/venue/${venue.slug}`}
+                href={`/${venue.slug}`}
                 className="group block overflow-hidden rounded-3xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta"
               >
                 <div className="relative aspect-[3/4]">

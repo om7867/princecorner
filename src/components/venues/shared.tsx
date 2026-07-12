@@ -149,7 +149,7 @@ export function VenueCTABanner({
         <p className="mt-4 text-balance text-linen/80">{subtitle}</p>
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
-            href="/#reservation"
+            href="/reserve"
             className="rounded-full bg-saffron px-9 py-3.5 font-body text-sm font-semibold tracking-wide text-espresso transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
           >
             {primaryLabel}

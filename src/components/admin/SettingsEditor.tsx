@@ -111,7 +111,7 @@ export function SettingsEditor() {
                 value={href}
                 onChange={(e) => setHref(e.target.value)}
                 disabled={!enabled}
-                placeholder="/venue/bar"
+                placeholder="/bar"
                 className={inputClasses}
               />
             </div>

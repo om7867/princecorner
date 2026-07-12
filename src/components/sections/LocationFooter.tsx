@@ -96,7 +96,7 @@ export function LocationFooter() {
               {VENUES.map((venue) => (
                 <li key={venue.slug}>
                   <Link
-                    href={`/venue/${venue.slug}`}
+                    href={`/${venue.slug}`}
                     className="text-sm text-linen/70 transition-colors hover:text-saffron"
                   >
                     {venue.name}
