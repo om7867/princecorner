@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Venue } from "@/data/venues";
+import { Reveal } from "@/components/ui/Reveal";
 
 type Tone = "dark" | "light";
 
@@ -22,14 +23,17 @@ export function VenueGalleryBand({
   return (
     <section aria-label={`${venue.name} gallery`} className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
-        <div className="text-center">
-          <p className={`font-body text-xs uppercase tracking-[0.35em] ${accentClass}`}>
-            {eyebrow}
-          </p>
-          <h2 className={`mt-4 text-balance font-display text-4xl italic ${heading}`}>
-            {title}
-          </h2>
-        </div>
+        <Reveal>
+          <div className="text-center">
+            <p className={`font-body text-xs uppercase tracking-[0.35em] ${accentClass}`}>
+              {eyebrow}
+            </p>
+            <h2 className={`mt-4 text-balance font-display text-4xl italic ${heading}`}>
+              {title}
+            </h2>
+          </div>
+        </Reveal>
+        <Reveal stagger>
         <ul className="mt-14 grid gap-5 sm:grid-cols-3" role="list">
           {venue.gallery.map((photo, i) => (
             <li
@@ -48,6 +52,7 @@ export function VenueGalleryBand({
             </li>
           ))}
         </ul>
+        </Reveal>
       </div>
     </section>
   );
@@ -71,14 +76,17 @@ export function VenueFAQ({
   return (
     <section aria-label="Frequently asked questions" className="px-6 py-24">
       <div className="mx-auto max-w-3xl">
-        <div className="text-center">
-          <p className={`font-body text-xs uppercase tracking-[0.35em] ${accentClass}`}>
-            Good to Know
-          </p>
-          <h2 className={`mt-4 font-display text-4xl italic ${heading}`}>
-            Questions, answered
-          </h2>
-        </div>
+        <Reveal>
+          <div className="text-center">
+            <p className={`font-body text-xs uppercase tracking-[0.35em] ${accentClass}`}>
+              Good to Know
+            </p>
+            <h2 className={`mt-4 font-display text-4xl italic ${heading}`}>
+              Questions, answered
+            </h2>
+          </div>
+        </Reveal>
+        <Reveal stagger>
         <div className="mt-12">
           {venue.faqs.map((faq) => (
             <details
@@ -104,6 +112,7 @@ export function VenueFAQ({
             </details>
           ))}
         </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -142,7 +151,29 @@ export function VenueCTABanner({
           }}
         />
       </div>
-      <div className="relative mx-auto max-w-2xl text-center">
+
+      {/* House words drifting past like end credits. */}
+      <div
+        aria-hidden
+        className="marquee absolute inset-x-0 top-8 font-body text-[11px] uppercase tracking-[0.3em] text-linen/45"
+      >
+        <div>
+          {[0, 1].map((copy) => (
+            <span key={copy} className="flex shrink-0 items-center gap-10 pr-10">
+              {[venue.name, venue.tagline, "Smaplee", venue.quickInfo.hours].map(
+                (word) => (
+                  <span key={word} className="flex items-center gap-10">
+                    {word}
+                    <span className="text-saffron">✦</span>
+                  </span>
+                )
+              )}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <Reveal className="relative mx-auto max-w-2xl text-center">
         <h2 className="text-balance font-display text-4xl italic text-linen sm:text-5xl">
           {title}
         </h2>
@@ -150,9 +181,14 @@ export function VenueCTABanner({
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/reserve"
-            className="rounded-full bg-saffron px-9 py-3.5 font-body text-sm font-semibold tracking-wide text-espresso transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
+            className="btn-ticket rounded-full bg-saffron px-9 py-3.5 font-body text-sm font-semibold tracking-wide text-espresso transition-transform duration-300 ease-[var(--ease-cubic)] [--ticket-notch:3.95rem] hover:scale-105 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
           >
             {primaryLabel}
+            <span aria-hidden className="ticket-stub">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7H12M12 7L8 3M12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
           </Link>
           <a
             href={`tel:${venue.quickInfo.phone.replace(/[^+\d]/g, "")}`}
@@ -164,7 +200,7 @@ export function VenueCTABanner({
         <p className="mt-6 font-body text-xs uppercase tracking-[0.25em] text-linen/50">
           {venue.quickInfo.hours} · {venue.quickInfo.address}
         </p>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CATEGORIES, type MenuCategory, type MenuItem } from "@/data/menu";
 import { useMediaCapability } from "@/lib/use-media-capability";
 import { PhotoDishScene } from "@/components/scenes/PhotoDishScene";
+import { Reveal } from "@/components/ui/Reveal";
 
 const DIETARY_LABEL: Record<string, string> = {
   vegetarian: "Vegetarian",
@@ -53,18 +54,20 @@ export function MenuShowcase({ items: allItems }: { items: MenuItem[] }) {
       className="relative bg-linen px-6 py-24 sm:py-32"
     >
       <div className="mx-auto max-w-6xl">
-        <div className="text-center">
-          <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
-            The Menu
-          </p>
-          <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso sm:text-5xl">
-            Made slow, served warm
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-balance text-espresso/70">
-            A short menu, changed with the seasons — every plate finished by
-            hand before it reaches your table.
-          </p>
-        </div>
+        <Reveal>
+          <div className="text-center">
+            <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
+              The Menu
+            </p>
+            <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso sm:text-5xl">
+              Made slow, served warm
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-balance text-espresso/70">
+              A short menu, changed with the seasons — every plate finished by
+              hand before it reaches your table.
+            </p>
+          </div>
+        </Reveal>
 
         {/* Category tabs */}
         <div

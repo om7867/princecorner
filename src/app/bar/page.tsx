@@ -13,16 +13,32 @@ import {
 } from "@/components/worlds/shared";
 import { VenueGalleryBand, VenueFAQ, VenueCTABanner } from "@/components/venues/shared";
 
+const venue = getVenue("bar")!;
+
 export const metadata: Metadata = {
   title: "The Bar",
   description:
     "Applewood smoke, garden herbs, and spirits worth sipping. Smaplee after dark.",
+  alternates: { canonical: "/bar" },
+  openGraph: {
+    title: "The Bar — Smaplee",
+    description:
+      "Applewood smoke, garden herbs, and spirits worth sipping. Smaplee after dark.",
+    url: "/bar",
+    images: [
+      {
+        url: venue.heroPhoto.src,
+        width: 1200,
+        height: 800,
+        alt: venue.heroPhoto.alt,
+      },
+    ],
+  },
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function BarWorldPage() {
-  const venue = getVenue("bar")!;
   const items = await getVenueItems(venue.featuredIds);
 
   return (
@@ -49,9 +65,14 @@ export default async function BarWorldPage() {
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
             <Link
               href="/reserve"
-              className="rounded-full bg-saffron px-8 py-3 font-body text-sm font-semibold tracking-wide text-espresso transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
+              className="btn-ticket rounded-full bg-saffron px-8 py-3 font-body text-sm font-semibold tracking-wide text-espresso transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
             >
               Claim a Corner
+              <span aria-hidden className="ticket-stub">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 7H12M12 7L8 3M12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
             </Link>
             <Link
               href="#cocktails"
@@ -63,7 +84,7 @@ export default async function BarWorldPage() {
         </WorldHero>
 
         {/* 2 — Camera pulls back over the line of drinks */}
-        <GapCaption dark eyebrow="The counter" title="Five drinks, built like rituals" />
+        <GapCaption dark scene="01" eyebrow="The counter" title="Five drinks, built like rituals" />
         <WorldGap h="h-[80vh]" />
 
         {/* 3 — Cocktail list */}
@@ -100,7 +121,7 @@ export default async function BarWorldPage() {
         </WorldSection>
 
         {/* 4 — Camera trucks along the glowing back bar */}
-        <GapCaption dark eyebrow="The back bar" title="Every bottle lit like it earned it" />
+        <GapCaption dark scene="02" eyebrow="The back bar" title="Every bottle lit like it earned it" />
         <WorldGap h="h-[85vh]" />
 
         <WorldSection ariaLabel="The back bar library" tone="dark">
@@ -169,7 +190,7 @@ export default async function BarWorldPage() {
         </WorldSection>
 
         {/* 6 — Camera turns to the stage corner */}
-        <GapCaption dark eyebrow="The corner stage" title="Thursday: the trio tunes up at eight" />
+        <GapCaption dark scene="03" eyebrow="The corner stage" title="Thursday: the trio tunes up at eight" />
         <WorldGap h="h-[70vh]" />
 
         <WorldSection ariaLabel="Nights at the bar" tone="dark">

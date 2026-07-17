@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { VENUES } from "@/data/venues";
+import { Reveal } from "@/components/ui/Reveal";
 
 export function VenueGrid() {
   return (
@@ -10,19 +11,22 @@ export function VenueGrid() {
       className="bg-linen-soft px-6 py-24 sm:py-32"
     >
       <div className="mx-auto max-w-6xl">
-        <div className="text-center">
-          <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
-            Four Rooms, One Table
-          </p>
-          <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso sm:text-5xl">
-            Explore our spaces
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-balance text-espresso/70">
-            Restaurant, café, bar, and bakery — each with its own light, its
-            own pace, and its own 3D story. Step inside.
-          </p>
-        </div>
+        <Reveal>
+          <div className="text-center">
+            <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
+              Four Rooms, One Table
+            </p>
+            <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso sm:text-5xl">
+              Explore our spaces
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-balance text-espresso/70">
+              Restaurant, café, bar, and bakery — each with its own light, its
+              own pace, and its own 3D story. Step inside.
+            </p>
+          </div>
+        </Reveal>
 
+        <Reveal stagger>
         <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" role="list">
           {VENUES.map((venue) => (
             <li key={venue.slug}>
@@ -72,6 +76,7 @@ export function VenueGrid() {
             </li>
           ))}
         </ul>
+        </Reveal>
       </div>
     </section>
   );

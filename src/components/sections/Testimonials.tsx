@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 const REVIEWS = [
   {
     quote:
@@ -48,15 +50,18 @@ export function Testimonials() {
       className="bg-linen-soft px-6 py-24 sm:py-32"
     >
       <div className="mx-auto max-w-6xl">
-        <div className="text-center">
-          <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
-            Word of Mouth
-          </p>
-          <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso sm:text-5xl">
-            What our guests keep saying
-          </h2>
-        </div>
+        <Reveal>
+          <div className="text-center">
+            <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
+              Word of Mouth
+            </p>
+            <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso sm:text-5xl">
+              What our guests keep saying
+            </h2>
+          </div>
+        </Reveal>
 
+        <Reveal stagger>
         <ul className="mt-14 grid gap-6 md:grid-cols-3" role="list">
           {REVIEWS.map((review) => (
             <li
@@ -80,6 +85,7 @@ export function Testimonials() {
             </li>
           ))}
         </ul>
+        </Reveal>
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { unsplash } from "@/data/menu";
+import { Reveal } from "@/components/ui/Reveal";
 
 const STATS = [
   { value: "2019", label: "The year our first levain was fed" },
@@ -17,7 +18,7 @@ export function OurStory() {
     >
       <div className="mx-auto max-w-6xl">
         <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div className="relative">
+          <Reveal className="relative">
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
               <Image
                 src={unsplash("1414235077428-338989a2e8c0", 900)}
@@ -36,9 +37,9 @@ export function OurStory() {
                 className="object-cover"
               />
             </div>
-          </div>
+          </Reveal>
 
-          <div>
+          <Reveal delay={120}>
             <p className="font-body text-xs uppercase tracking-[0.35em] text-saffron">
               Our Story
             </p>
@@ -72,7 +73,7 @@ export function OurStory() {
                 </div>
               ))}
             </dl>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

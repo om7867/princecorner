@@ -21,9 +21,19 @@ function subscribeToStorage(onChange: () => void) {
 
 export function SiteNavbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [justDismissed, setJustDismissed] = useState(false);
   const [live, setLive] = useState<LiveSite | null>(null);
   const pathname = usePathname();
+
+  // past the hero's first beat the loose pills condense into one glass
+  // capsule — quieter chrome once the film is the main event
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 32);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // announcement + branding are admin-editable — always read them live
   useEffect(() => {
@@ -63,7 +73,7 @@ export function SiteNavbar() {
         <div
           role="region"
           aria-label="Announcement"
-          className="relative flex items-center justify-center gap-3 bg-saffron px-10 py-2 text-center"
+          className="relative flex items-center justify-center gap-3 bg-saffron/80 px-10 py-2 text-center backdrop-blur-md"
         >
           <p className="font-body text-xs font-medium text-espresso sm:text-sm">
             {announcement.text}{" "}
@@ -86,11 +96,20 @@ export function SiteNavbar() {
           </button>
         </div>
       )}
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+      <div className="px-4 sm:px-5">
+        <div
+          className={`mx-auto flex items-center justify-between transition-all duration-500 ease-[var(--ease-out-expo)] ${
+            scrolled
+              ? "mt-2 max-w-3xl rounded-full glass-dark px-2.5 py-1.5"
+              : "max-w-6xl py-3"
+          }`}
+        >
         <Link
           href="/"
           onClick={() => setOpen(false)}
-          className="rounded-2xl bg-espresso/60 px-4 py-1.5 text-center backdrop-blur-md transition-colors hover:bg-espresso/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
+          className={`rounded-2xl px-4 py-1.5 text-center backdrop-blur-md transition-colors duration-500 hover:bg-espresso/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron ${
+            scrolled ? "bg-transparent" : "bg-espresso/60"
+          }`}
         >
           {live?.presents && (
             <span className="block font-body text-[8px] uppercase tracking-[0.25em] text-saffron/90">
@@ -98,14 +117,16 @@ export function SiteNavbar() {
             </span>
           )}
           <span className="block font-display text-lg italic leading-tight text-linen">
-            Smaplee
+            Smaplee<span className="text-saffron">.</span>
           </span>
         </Link>
 
         {/* Desktop links */}
         <nav
           aria-label="Primary"
-          className="hidden items-center gap-1 rounded-full bg-espresso/60 p-1.5 backdrop-blur-md md:flex"
+          className={`hidden items-center gap-1 rounded-full p-1.5 backdrop-blur-md transition-colors duration-500 md:flex ${
+            scrolled ? "bg-transparent" : "bg-espresso/60"
+          }`}
         >
           {links.map((link) => {
             const isActive = pathname === link.href;
@@ -128,13 +149,18 @@ export function SiteNavbar() {
           <Link
             href="/reserve"
             aria-current={pathname === "/reserve" ? "page" : undefined}
-            className={`ml-1 rounded-full px-4 py-1.5 font-body text-sm font-semibold transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron ${
+            className={`btn-ticket ml-1 rounded-full px-4 py-1.5 font-body text-sm font-semibold transition-transform duration-300 ease-[var(--ease-cubic)] [--ticket-notch:2.55rem] hover:scale-105 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron ${
               pathname === "/reserve"
                 ? "bg-saffron text-espresso"
                 : "bg-terracotta text-linen"
             }`}
           >
             Reserve
+            <span aria-hidden className="ticket-stub">
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7H12M12 7L8 3M12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
           </Link>
         </nav>
 
@@ -165,6 +191,7 @@ export function SiteNavbar() {
             )}
           </svg>
         </button>
+        </div>
       </div>
 
       {/* Mobile slide-down panel */}
@@ -172,7 +199,7 @@ export function SiteNavbar() {
         <nav
           id="mobile-nav"
           aria-label="Primary"
-          className="mx-5 rounded-2xl bg-espresso/90 p-3 backdrop-blur-lg md:hidden"
+          className="glass-dark mx-5 mt-2 rounded-2xl p-3 motion-safe:animate-[fade-rise_0.35s_var(--ease-out-expo)_both] md:hidden"
         >
           <ul className="flex flex-col gap-1">
             {links.map((link) => (

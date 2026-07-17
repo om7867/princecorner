@@ -1,9 +1,49 @@
 "use client";
 
-import { Suspense, useEffect, useRef, type MutableRefObject } from "react";
+import {
+  Component,
+  Suspense,
+  useEffect,
+  useRef,
+  type MutableRefObject,
+  type ReactNode,
+} from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, RoundedBox, Sparkles, useTexture } from "@react-three/drei";
 import * as THREE from "three";
+
+/**
+ * Remote photos load through the Next.js image optimizer so the WebGL
+ * texture request is same-origin — direct hits to images.unsplash.com
+ * get blocked by ad-blockers/strict networks, which crashed the canvas.
+ * Local /public paths pass through untouched.
+ */
+function textureUrl(url: string): string {
+  if (!/^https?:\/\//.test(url)) return url;
+  return `/_next/image?url=${encodeURIComponent(url)}&w=828&q=75`;
+}
+
+/** If the texture still fails, show the flat photo instead of crashing. */
+class SceneErrorBoundary extends Component<
+  { fallback: ReactNode; resetKey: string; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidUpdate(prev: { resetKey: string }) {
+    if (prev.resetKey !== this.props.resetKey && this.state.failed) {
+      this.setState({ failed: false });
+    }
+  }
+
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
 
 /**
  * The real food photo as a 3D object: a thick ceramic-edged card that
@@ -20,7 +60,7 @@ function PhotoCard({
   spinProgress?: MutableRefObject<number>;
   reducedMotion: boolean;
 }) {
-  const texture = useTexture(url, (tex) => {
+  const texture = useTexture(textureUrl(url), (tex) => {
     tex.colorSpace = THREE.SRGBColorSpace;
   });
 
@@ -95,42 +135,55 @@ export function PhotoDishScene({
   cameraZ?: number;
 }) {
   return (
-    <Canvas
-      dpr={[1, 1.5]}
-      camera={{ position: [0, 0.15, cameraZ], fov: 34 }}
-      gl={{ antialias: true, powerPreference: "high-performance" }}
+    <SceneErrorBoundary
+      resetKey={url}
+      fallback={
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={textureUrl(url)}
+          alt=""
+          aria-hidden
+          className="h-full w-full object-cover"
+        />
+      }
     >
-      <Suspense fallback={null}>
-        <ambientLight intensity={0.85} color="#f5eee3" />
-        <directionalLight position={[3, 4, 3]} intensity={1.1} color="#e7a73a" />
-        <pointLight position={[-3, 1, 2]} intensity={0.4} color="#c1622c" />
+      <Canvas
+        dpr={[1, 1.5]}
+        camera={{ position: [0, 0.15, cameraZ], fov: 34 }}
+        gl={{ antialias: true, powerPreference: "high-performance" }}
+      >
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.85} color="#f5eee3" />
+          <directionalLight position={[3, 4, 3]} intensity={1.1} color="#e7a73a" />
+          <pointLight position={[-3, 1, 2]} intensity={0.4} color="#c1622c" />
 
-        <PhotoCard
-          url={url}
-          spinProgress={spinProgress}
-          reducedMotion={reducedMotion}
-        />
-
-        {sparkles && !reducedMotion && (
-          <Sparkles
-            count={24}
-            scale={[4.5, 3.2, 2]}
-            size={2}
-            speed={0.15}
-            opacity={0.35}
-            color="#f5eee3"
+          <PhotoCard
+            url={url}
+            spinProgress={spinProgress}
+            reducedMotion={reducedMotion}
           />
-        )}
 
-        <ContactShadows
-          position={[0, -1.7, 0]}
-          opacity={0.5}
-          scale={7}
-          blur={2.6}
-          far={2.4}
-          color="#2e1e12"
-        />
-      </Suspense>
-    </Canvas>
+          {sparkles && !reducedMotion && (
+            <Sparkles
+              count={24}
+              scale={[4.5, 3.2, 2]}
+              size={2}
+              speed={0.15}
+              opacity={0.35}
+              color="#f5eee3"
+            />
+          )}
+
+          <ContactShadows
+            position={[0, -1.7, 0]}
+            opacity={0.5}
+            scale={7}
+            blur={2.6}
+            far={2.4}
+            color="#2e1e12"
+          />
+        </Suspense>
+      </Canvas>
+    </SceneErrorBoundary>
   );
 }

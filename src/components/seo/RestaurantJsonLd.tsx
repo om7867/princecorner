@@ -44,9 +44,10 @@ export function RestaurantJsonLd() {
         closes: "21:00",
       },
     ],
+    hasMenu: `${SITE.url}/menu`,
     potentialAction: {
       "@type": "ReserveAction",
-      target: `${SITE.url}/#reservation`,
+      target: `${SITE.url}/reserve`,
       name: "Reserve a table",
     },
   };

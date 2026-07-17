@@ -13,16 +13,32 @@ import {
 } from "@/components/worlds/shared";
 import { VenueGalleryBand, VenueFAQ, VenueCTABanner } from "@/components/venues/shared";
 
+const venue = getVenue("bakery")!;
+
 export const metadata: Metadata = {
   title: "The Bakery",
   description:
     "Levain fed by hand, crusts that crackle, shelves that empty by noon. Baked every morning.",
+  alternates: { canonical: "/bakery" },
+  openGraph: {
+    title: "The Bakery — Smaplee",
+    description:
+      "Levain fed by hand, crusts that crackle, shelves that empty by noon. Baked every morning.",
+    url: "/bakery",
+    images: [
+      {
+        url: venue.heroPhoto.src,
+        width: 1200,
+        height: 800,
+        alt: venue.heroPhoto.alt,
+      },
+    ],
+  },
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function BakeryWorldPage() {
-  const venue = getVenue("bakery")!;
   const items = await getVenueItems(venue.featuredIds);
 
   return (
@@ -49,9 +65,14 @@ export default async function BakeryWorldPage() {
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
             <Link
               href="/order?table=T1"
-              className="rounded-full bg-espresso px-8 py-3 font-body text-sm font-semibold tracking-wide text-linen transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-espresso"
+              className="btn-ticket rounded-full bg-espresso px-8 py-3 font-body text-sm font-semibold tracking-wide text-linen transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-espresso"
             >
               Order for Pickup
+              <span aria-hidden className="ticket-stub">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 7H12M12 7L8 3M12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
             </Link>
             <Link
               href="#breads"
@@ -63,7 +84,7 @@ export default async function BakeryWorldPage() {
         </WorldHero>
 
         {/* 2 — Camera drifts along the day's bake */}
-        <GapCaption dark={false} eyebrow="Today's bake" title="Out of the deck oven since 6:30" />
+        <GapCaption dark={false} scene="01" eyebrow="Today's bake" title="Out of the deck oven since 6:30" />
         <WorldGap h="h-[85vh]" />
 
         {/* 3 — Oven clock timeline */}
@@ -128,7 +149,7 @@ export default async function BakeryWorldPage() {
         </WorldSection>
 
         {/* 5 — Camera peers into the oven mouth */}
-        <GapCaption dark={false} eyebrow="Behind the oven" title="The levain is older than the bakery" />
+        <GapCaption dark={false} scene="02" eyebrow="Behind the oven" title="The levain is older than the bakery" />
         <WorldGap h="h-[75vh]" />
 
         <WorldSection ariaLabel="Behind the oven" tone="light">

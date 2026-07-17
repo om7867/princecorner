@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { unsplash } from "@/data/menu";
+import { Reveal } from "@/components/ui/Reveal";
 
 const GALLERY = [
   {
@@ -36,14 +37,17 @@ export function GalleryStrip() {
       className="bg-linen px-6 py-24"
     >
       <div className="mx-auto max-w-6xl">
-        <div className="text-center">
-          <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
-            Moments
-          </p>
-          <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso">
-            From our table
-          </h2>
-        </div>
+        <Reveal>
+          <div className="text-center">
+            <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
+              Moments
+            </p>
+            <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso">
+              From our table
+            </h2>
+          </div>
+        </Reveal>
+        <Reveal stagger>
         <ul
           role="list"
           className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
@@ -65,6 +69,7 @@ export function GalleryStrip() {
             </li>
           ))}
         </ul>
+        </Reveal>
       </div>
     </section>
   );

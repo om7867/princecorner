@@ -3,11 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getVenue, RESTAURANT_TASTING, RESTAURANT_HOURS } from "@/data/venues";
 import { getVenueItems } from "@/server/store";
-import { WorldCanvas } from "@/scenes/core/WorldCanvas";
-import {
-  RestaurantWorld,
-  RESTAURANT_KEYFRAMES,
-} from "@/scenes/worlds/RestaurantWorld";
+import { ScrollFilm } from "@/components/worlds/ScrollFilm";
 import {
   WorldHero,
   WorldSection,
@@ -15,11 +11,29 @@ import {
   GapCaption,
 } from "@/components/worlds/shared";
 import { VenueGalleryBand, VenueFAQ, VenueCTABanner } from "@/components/venues/shared";
+import { VideoJsonLd } from "@/components/seo/VideoJsonLd";
+
+const venue = getVenue("restaurant")!;
 
 export const metadata: Metadata = {
   title: "The Restaurant",
   description:
     "Golden-hour lighting, hand-thrown ceramics, and a short seasonal menu cooked over fire.",
+  alternates: { canonical: "/restaurant" },
+  openGraph: {
+    title: "The Restaurant — Smaplee",
+    description:
+      "Golden-hour lighting, hand-thrown ceramics, and a short seasonal menu cooked over fire.",
+    url: "/restaurant",
+    images: [
+      {
+        url: venue.heroPhoto.src,
+        width: 1200,
+        height: 800,
+        alt: venue.heroPhoto.alt,
+      },
+    ],
+  },
 };
 
 export const dynamic = "force-dynamic";
@@ -31,17 +45,26 @@ const WINES = [
 ];
 
 export default async function RestaurantWorldPage() {
-  const venue = getVenue("restaurant")!;
   const items = await getVenueItems(venue.featuredIds);
 
   return (
     <>
-      <WorldCanvas
-        keyframes={RESTAURANT_KEYFRAMES}
+      <VideoJsonLd
+        name="A Smaplee pizza, assembled over fire"
+        description="San Marzano sauce, hand-torn mozzarella, and ninety seconds in the wood fire — one pie built in eight seconds of stop-motion film."
+        contentUrl="/restaurant-film.mp4"
+        thumbnailUrl="/restaurant-film-poster.jpg"
+        duration="PT8S"
+      />
+
+      {/* The page IS the film: an 8-second stop-motion pizza assembly,
+          scrubbed by scroll. Sauce → mozzarella → fire, beat-matched to the
+          gaps between content panels below. */}
+      <ScrollFilm
+        src="/restaurant-film.mp4"
+        poster="/restaurant-film-poster.jpg"
         backdrop="bg-gradient-to-b from-[#241811] via-[#181210] to-[#100c0a]"
-      >
-        <RestaurantWorld />
-      </WorldCanvas>
+      />
 
       <main className="relative z-10 text-linen">
         {/* 1 — Hero: establishing shot, camera high over the table */}
@@ -58,9 +81,14 @@ export default async function RestaurantWorldPage() {
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
             <Link
               href="/reserve"
-              className="rounded-full bg-saffron px-8 py-3 font-body text-sm font-semibold tracking-wide text-espresso transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
+              className="btn-ticket rounded-full bg-saffron px-8 py-3 font-body text-sm font-semibold tracking-wide text-espresso transition-transform duration-300 ease-[var(--ease-cubic)] hover:scale-105 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saffron"
             >
               Book the Dining Room
+              <span aria-hidden className="ticket-stub">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 7H12M12 7L8 3M12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
             </Link>
             <Link
               href="#tasting"
@@ -88,9 +116,9 @@ export default async function RestaurantWorldPage() {
           </div>
         </WorldSection>
 
-        {/* 3 — Camera trucks along the five courses laid on the 3D table */}
-        <GapCaption dark eyebrow="Look down the table" title="Five courses, laid out in front of you" />
-        <WorldGap h="h-[85vh]" />
+        {/* 3 — Film beat: San Marzano sauce swirled across the dough */}
+        <GapCaption dark scene="01" eyebrow="First, the sauce" title="San Marzano, swirled by hand — keep scrolling" />
+        <WorldGap h="h-[95vh]" />
 
         {/* 4 — The tasting menu */}
         <WorldSection id="tasting" ariaLabel="Tasting menu" tone="dark">
@@ -164,9 +192,9 @@ export default async function RestaurantWorldPage() {
           </div>
         </WorldSection>
 
-        {/* 6 — Camera turns to the fire-lit kitchen pass */}
-        <GapCaption dark eyebrow="The pass" title="Where every plate is finished" />
-        <WorldGap h="h-[75vh]" />
+        {/* 6 — Film beat: torn mozzarella and basil land on the pie */}
+        <GapCaption dark scene="02" eyebrow="Then, the mozzarella" title="Torn by hand, never sliced — basil last" />
+        <WorldGap h="h-[85vh]" />
 
         <WorldSection ariaLabel="From the chef" tone="dark">
           <blockquote className="mx-auto max-w-2xl text-center">
@@ -180,9 +208,9 @@ export default async function RestaurantWorldPage() {
           </blockquote>
         </WorldSection>
 
-        {/* 7 — Camera drifts to the wine wall */}
-        <GapCaption dark eyebrow="The cellar wall" title="Forty bottles, three of them perfect for tonight" />
-        <WorldGap h="h-[75vh]" />
+        {/* 7 — Film beat: cold-pressed oil, steam, the fire behind */}
+        <GapCaption dark scene="03" eyebrow="The finish" title="Cold-pressed oil, wood fire, sixty seconds" />
+        <WorldGap h="h-[85vh]" />
 
         <WorldSection ariaLabel="Wine and pairings" tone="dark">
           <div className="mx-auto max-w-3xl">
@@ -211,18 +239,24 @@ export default async function RestaurantWorldPage() {
           </div>
         </WorldSection>
 
-        {/* 8 — Gallery, FAQ */}
-        <div className="bg-[#181210]/90 backdrop-blur-md">
-          <VenueGalleryBand
-            venue={venue}
-            tone="dark"
-            title="The room at golden hour"
-            accentClass="text-saffron"
-          />
-          <VenueFAQ venue={venue} tone="dark" accentClass="text-saffron" />
+        {/* 8 — Gallery, FAQ, floating like the sections above */}
+        <div className="px-4 py-8 sm:px-6">
+          <div className="glass-dark mx-auto max-w-6xl rounded-[2.5rem]">
+            <VenueGalleryBand
+              venue={venue}
+              tone="dark"
+              title="The room at golden hour"
+              accentClass="text-saffron"
+            />
+            <VenueFAQ venue={venue} tone="dark" accentClass="text-saffron" />
+          </div>
         </div>
 
-        {/* 9 — Hours + closing CTA */}
+        {/* 9 — Film beat: the fired pie, full frame, nothing over it */}
+        <GapCaption dark scene="04" eyebrow="Out of the fire" title="Ninety seconds, blistered and done" />
+        <WorldGap h="h-[90vh]" />
+
+        {/* 10 — Hours + closing CTA */}
         <WorldSection ariaLabel="Hours" tone="dark">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="font-display text-3xl italic text-linen">Dinner hours</h2>

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Venue } from "@/data/venues";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Layout grammar for 3D world pages: content panels are translucent scrims
@@ -24,17 +25,23 @@ export function WorldSection({
   children: ReactNode;
   className?: string;
 }) {
-  const scrim =
-    tone === "dark"
-      ? "bg-[#181210]/85 backdrop-blur-md"
-      : "bg-linen/90 backdrop-blur-md";
+  // A floating glass card, not a full-bleed bar: the film stays in view down
+  // both margins and in the breathing room between panels, so the page never
+  // fully covers the footage it's scrubbing. Content rises into place as the
+  // card enters the viewport.
   return (
     <section
       id={id}
       aria-label={ariaLabel}
-      className={`relative px-6 py-24 ${scrim} ${className}`}
+      className={`relative px-4 py-8 sm:px-6 ${className}`}
     >
-      {children}
+      <div
+        className={`frame-card mx-auto max-w-6xl rounded-[2.5rem] px-6 py-20 sm:px-12 ${
+          tone === "dark" ? "glass-dark" : "glass-light"
+        }`}
+      >
+        <Reveal>{children}</Reveal>
+      </div>
     </section>
   );
 }
@@ -114,60 +121,95 @@ export function WorldHero({
         className={`absolute inset-0 bg-gradient-to-r ${scrimSide}`}
       />
       <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-4 px-6 pt-20 lg:grid-cols-2">
-        <div className="text-center lg:text-left">
+        <div className="text-center motion-safe:animate-[fade-rise_0.9s_var(--ease-out-expo)_both] lg:text-left">
           {children}
           <QuickInfo venue={venue} dark={dark} />
         </div>
-        {/* right half deliberately empty — the WebGL hero object lives here */}
+        {/* right half deliberately empty — the film's hero subject lives here */}
         <div aria-hidden className="hidden lg:block" />
       </div>
       <div
         aria-hidden
-        className={`absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1.5 ${cue}`}
+        className={`absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 motion-safe:animate-[fade-rise_0.9s_var(--ease-out-expo)_0.5s_both] ${cue}`}
       >
         <span className="font-body text-[10px] uppercase tracking-[0.3em]">
           Scroll
         </span>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="motion-safe:animate-bounce">
-          <path d="M2 5L8 11L14 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <span className="relative block h-9 w-px overflow-hidden bg-current/25">
+          <span className="absolute inset-x-0 top-0 h-1/2 bg-current motion-safe:animate-[cue-drop_1.8s_var(--ease-cubic)_infinite]" />
+        </span>
       </div>
     </section>
   );
 }
 
-/** Caption chip floated over a camera-move Gap, naming what you're seeing. */
+/**
+ * Clapper slate floated over a camera-move Gap: striped clap bar, scene
+ * numeral, a live REC dot — the page names its own footage like a take.
+ */
 export function GapCaption({
   dark,
   eyebrow,
   title,
+  scene,
 }: {
   dark: boolean;
   eyebrow: string;
   title: string;
+  /** Chapter numeral shown as a ghost figure beside the slate, e.g. "02". */
+  scene?: string;
 }) {
   return (
     <div className="pointer-events-none relative z-10 mx-auto -mb-[55vh] flex h-[55vh] max-w-6xl items-end px-6 pb-10">
-      <div
-        className={`rounded-2xl px-6 py-4 backdrop-blur-md ${
-          dark ? "bg-espresso/70" : "bg-linen/80"
-        }`}
-      >
-        <p
-          className={`font-body text-[11px] uppercase tracking-[0.3em] ${
-            dark ? "text-saffron" : "text-terracotta"
-          }`}
-        >
-          {eyebrow}
-        </p>
-        <p
-          className={`mt-1 font-display text-xl italic ${
-            dark ? "text-linen" : "text-espresso"
-          }`}
-        >
-          {title}
-        </p>
-      </div>
+      <Reveal>
+        <div className="flex items-end gap-4">
+          {scene && (
+            <span
+              aria-hidden
+              className={`select-none font-display text-7xl italic leading-[0.8] ${
+                dark ? "text-linen/30" : "text-espresso/25"
+              }`}
+            >
+              {scene}
+            </span>
+          )}
+          <div
+            className={`overflow-hidden rounded-2xl ${
+              dark ? "glass-dark" : "glass-light"
+            }`}
+          >
+            <div
+              aria-hidden
+              className="h-2 w-full opacity-90"
+              style={{
+                background: `repeating-linear-gradient(-45deg, ${
+                  dark ? "var(--color-saffron)" : "var(--color-terracotta)"
+                } 0 9px, transparent 9px 18px)`,
+              }}
+            />
+            <div className="px-6 py-4">
+              <p
+                className={`flex items-center gap-2 font-body text-[11px] uppercase tracking-[0.3em] ${
+                  dark ? "text-saffron" : "text-terracotta"
+                }`}
+              >
+                <span
+                  aria-hidden
+                  className="h-1.5 w-1.5 rounded-full bg-terracotta motion-safe:animate-pulse"
+                />
+                {scene ? `Scene ${scene} — ${eyebrow}` : eyebrow}
+              </p>
+              <p
+                className={`mt-1 font-display text-xl italic ${
+                  dark ? "text-linen" : "text-espresso"
+                }`}
+              >
+                {title}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Reveal>
     </div>
   );
 }
