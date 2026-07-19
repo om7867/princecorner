@@ -1,13 +1,21 @@
-"""Idempotent dev seed: ports the old demo's menu/site content into real DB
-rows and creates one Owner user so the app isn't empty on first run.
+"""One-command bootstrap for a fresh machine: creates the database if it
+doesn't exist (Postgres), runs every Alembic migration to head, then seeds
+demo content + one Owner user. Idempotent — safe to re-run any time; seeding
+is skipped if the restaurant already exists, and migrations only apply
+what's missing.
 
-Run with: python -m app.seed
+Run with (from backend/, venv active): python -m app.seed
 """
 
 import asyncio
 from decimal import Decimal
+from pathlib import Path
 
+import sqlalchemy as sa
+from alembic import command as alembic_command
+from alembic.config import Config as AlembicConfig
 from sqlalchemy import select
+from sqlalchemy.engine import make_url
 
 from app.core.config import get_settings
 from app.core.security import hash_password
@@ -21,8 +29,46 @@ from app.models.site_settings import SiteSettings
 from app.models.table import RestaurantTable
 from app.models.user import RoleEnum, User
 
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+
 OWNER_EMAIL = get_settings().seed_owner_email
 OWNER_PASSWORD = get_settings().seed_owner_password
+
+
+def ensure_database_exists() -> None:
+    """Creates the target Postgres database if it doesn't exist yet, by
+    connecting to the server's maintenance DB. SQLite needs nothing — the
+    file is created on first connect."""
+    url = make_url(get_settings().sync_database_url)
+    if url.drivername.startswith("sqlite"):
+        return
+
+    try:
+        engine = sa.create_engine(url)
+        with engine.connect():
+            pass
+        engine.dispose()
+        return  # database already there
+    except sa.exc.OperationalError as exc:
+        # Only handle "database does not exist" — bad credentials / server
+        # down should fail loudly, not silently try to CREATE DATABASE.
+        if "does not exist" not in str(exc):
+            raise
+
+    admin_engine = sa.create_engine(url.set(database="postgres"), isolation_level="AUTOCOMMIT")
+    with admin_engine.connect() as conn:
+        conn.execute(sa.text(f'CREATE DATABASE "{url.database}"'))
+    admin_engine.dispose()
+    print(f"Created database: {url.database}")
+
+
+def run_migrations() -> None:
+    """Applies every Alembic migration up to head — creates all tables on an
+    empty database, or just the missing increments on an existing one."""
+    cfg = AlembicConfig(str(BACKEND_DIR / "alembic.ini"))
+    cfg.set_main_option("script_location", str(BACKEND_DIR / "alembic"))
+    alembic_command.upgrade(cfg, "head")
+    print("Migrations up to date (alembic head).")
 
 CATEGORIES = [
     {"slug": "starters", "name": "Starters"},
@@ -290,5 +336,11 @@ async def seed() -> None:
         print("Dev-only credentials — change immediately before any real deployment.")
 
 
-if __name__ == "__main__":
+def bootstrap() -> None:
+    ensure_database_exists()
+    run_migrations()
     asyncio.run(seed())
+
+
+if __name__ == "__main__":
+    bootstrap()

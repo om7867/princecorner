@@ -31,14 +31,20 @@ python -m venv .venv
 ./.venv/Scripts/pip install -r requirements.txt   # Windows
 # source .venv/bin/activate && pip install -r requirements.txt   # macOS/Linux
 cp .env.example .env
-./.venv/Scripts/python -m alembic upgrade head
-./.venv/Scripts/python -m app.seed
+./.venv/Scripts/python -m app.seed   # one command: creates the DB (Postgres),
+                                     # runs all migrations, seeds demo data
 
 # Frontend
 cd ../frontend
 npm install
 cp .env.local.example .env.local
 ```
+
+`app.seed` is fully idempotent — run it again any time; it only applies
+missing migrations and skips seeding if data already exists. On Postgres it
+even creates the database itself if it doesn't exist yet (SQLite needs
+nothing). So on a brand-new PC: install deps, set `.env`, run the seed —
+done.
 
 The seed script prints a dev-only Owner login:
 
