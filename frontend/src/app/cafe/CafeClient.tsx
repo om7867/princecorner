@@ -149,7 +149,7 @@ export function CafeClient({ items, siteName }: { items: MenuItemDTO[]; siteName
         <div ref={horizontalWrapperRef} className="flex flex-col lg:flex-row h-auto lg:h-screen w-full lg:w-max">
           
           {/* Panel 1: Intro - Awwwards Style Kinetic Layout */}
-          <div className="w-full lg:w-[120vw] h-[50vh] lg:h-screen flex items-center relative overflow-hidden shrink-0 pl-12 lg:pl-32">
+          <div className="w-full lg:w-[120vw] h-auto py-24 lg:py-0 lg:h-screen flex items-center relative overflow-hidden shrink-0 px-6 lg:pl-32">
              
              {/* Massive Background Parallax Text */}
              <div className="absolute top-1/2 left-0 -translate-y-1/2 opacity-[0.03] pointer-events-none whitespace-nowrap">
@@ -160,7 +160,7 @@ export function CafeClient({ items, siteName }: { items: MenuItemDTO[]; siteName
 
              <div className="relative z-10 max-w-4xl flex flex-col lg:flex-row gap-12 lg:gap-24 items-start lg:items-center">
                <div className="lg:w-1/2">
-                 <h2 className="font-display text-6xl lg:text-8xl italic text-linen leading-[0.9]">
+                 <h2 className="font-display text-5xl lg:text-8xl italic text-linen leading-[0.9]">
                    Three weeks<br/>
                    <span className="text-terracotta">from farm</span><br/>
                    to cup.
@@ -179,26 +179,26 @@ export function CafeClient({ items, siteName }: { items: MenuItemDTO[]; siteName
           </div>
 
           {/* Panel 2: The Brew Bar - Overlapping Gallery Style */}
-          <div className="w-full lg:w-[200vw] h-auto lg:h-screen flex items-center p-12 lg:p-32 shrink-0 relative">
+          <div className="w-full lg:w-[200vw] h-auto lg:h-screen flex items-center pt-12 pb-24 lg:p-32 shrink-0 relative">
             
             {/* Background Graphic */}
             <div className="absolute right-0 bottom-0 w-[50vw] h-[50vw] bg-terracotta/5 blur-[150px] rounded-full pointer-events-none" />
 
-            <div className="flex flex-col lg:flex-row gap-24 w-full h-full items-center">
+            <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 w-full h-full items-start lg:items-center">
               
               {/* Sticky Title Block inside the horizontal scroll */}
-              <div className="lg:w-[30vw] shrink-0 relative z-10">
+              <div className="lg:w-[30vw] shrink-0 relative z-10 px-6 lg:px-0">
                 <p className="font-body text-sm uppercase tracking-[0.4em] text-terracotta mb-6 flex items-center gap-4">
                   <span className="w-8 h-[1px] bg-terracotta" />
                   The Brew Bar
                 </p>
-                <h2 className="font-display text-6xl lg:text-8xl italic text-linen leading-none">
+                <h2 className="font-display text-5xl lg:text-8xl italic text-linen leading-none">
                   Four ways<br/>to take<br/>your coffee.
                 </h2>
               </div>
 
-              {/* Unique Staggered Cards */}
-              <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 w-full items-center">
+              {/* Unique Staggered Cards (Horizontal Swipe on Mobile) */}
+              <div className="flex flex-row overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none gap-6 lg:gap-16 w-full items-center pb-8 lg:pb-0 px-6 lg:px-0 no-scrollbar">
                 {CAFE_BREWS.map((brew, idx) => {
                   // Create a staggered vertical offset for the cards to make it look organic
                   const offsetClass = idx % 2 === 0 ? "lg:-translate-y-12" : "lg:translate-y-12";
@@ -206,23 +206,23 @@ export function CafeClient({ items, siteName }: { items: MenuItemDTO[]; siteName
                   return (
                     <div 
                       key={brew.name} 
-                      className={`group relative w-full lg:w-[28vw] h-[350px] lg:h-[60vh] rounded-[2rem] border border-white/5 bg-[#1a130f] p-10 flex flex-col justify-between transition-transform duration-700 hover:scale-[1.02] hover:bg-[#1f1712] ${offsetClass}`}
+                      className={`group relative shrink-0 snap-center w-[85vw] lg:w-[28vw] h-[350px] lg:h-[60vh] rounded-[2rem] border border-white/5 bg-[#1a130f] p-8 lg:p-10 flex flex-col justify-between transition-transform duration-700 hover:scale-[1.02] hover:bg-[#1f1712] ${offsetClass}`}
                     >
                       {/* Giant Number Indicator */}
-                      <span className="absolute top-4 right-8 font-display text-8xl italic text-white/[0.03] pointer-events-none transition-colors duration-500 group-hover:text-terracotta/[0.05]">
+                      <span className="absolute top-4 right-8 font-display text-7xl lg:text-8xl italic text-white/[0.03] pointer-events-none transition-colors duration-500 group-hover:text-terracotta/[0.05]">
                         0{idx + 1}
                       </span>
                       
                       <div className="relative z-10">
-                        <span className="inline-block px-4 py-1.5 rounded-full border border-terracotta/30 text-terracotta font-body text-xs tracking-[0.2em] uppercase mb-8">
+                        <span className="inline-block px-4 py-1.5 rounded-full border border-terracotta/30 text-terracotta font-body text-xs tracking-[0.2em] uppercase mb-6 lg:mb-8">
                           {brew.price}
                         </span>
-                        <h3 className="font-display text-4xl text-linen mb-6">{brew.name}</h3>
+                        <h3 className="font-display text-3xl lg:text-4xl text-linen mb-4 lg:mb-6">{brew.name}</h3>
                       </div>
                       
                       <div className="relative z-10">
-                        <div className="w-full h-[1px] bg-gradient-to-r from-white/10 to-transparent mb-6" />
-                        <p className="font-body text-lg text-linen/50 leading-relaxed font-light">
+                        <div className="w-full h-[1px] bg-gradient-to-r from-white/10 to-transparent mb-4 lg:mb-6" />
+                        <p className="font-body text-base lg:text-lg text-linen/50 leading-relaxed font-light">
                           {brew.detail}
                         </p>
                       </div>

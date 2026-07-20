@@ -83,53 +83,58 @@ export function BillView({
   }
 
   return (
-    <section aria-label="Your bill" className="mt-4 rounded-2xl border-2 border-saffron/60 bg-linen-soft p-4">
-      <div className="flex items-baseline justify-between">
-        <h2 className="font-display text-lg italic text-espresso">Your bill</h2>
-        <span className="rounded-full bg-saffron/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-terracotta">
+    <section aria-label="Your bill" className="mt-6 rounded-[2rem] border border-saffron/20 bg-gradient-to-b from-[#14100b] to-[#0e0b08] p-6 shadow-2xl">
+      <div className="flex items-baseline justify-between mb-4">
+        <h2 className="font-display text-2xl italic text-linen">Receipt</h2>
+        <span className="rounded-full border border-saffron/30 bg-saffron/10 px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-saffron">
           {invoice.status}
         </span>
       </div>
 
-      <ul className="mt-3 space-y-1 text-sm text-espresso/80">
+      <ul className="mt-4 space-y-2 font-body text-sm text-linen/70">
         {invoice.orders.map((o) => (
-          <li key={o.id} className="flex justify-between">
-            <span>{o.display_code}</span>
-            <span>{formatMoney(o.total)}</span>
+          <li key={o.id} className="flex justify-between items-end gap-2">
+            <span>Order {o.display_code}</span>
+            <div className="flex-grow border-b border-dotted border-white/10 mb-1.5 mx-2" />
+            <span className="font-semibold text-saffron">{formatMoney(o.total)}</span>
           </li>
         ))}
       </ul>
 
-      <dl className="mt-3 space-y-1 border-t border-espresso/10 pt-3 text-sm">
+      <dl className="mt-6 space-y-2 border-t border-white/10 pt-4 font-body text-sm">
         {Number(invoice.discount_amount) > 0 && (
-          <div className="flex justify-between text-sage">
-            <dt>Discount</dt>
+          <div className="flex justify-between items-end text-sage">
+            <dt className="uppercase tracking-widest text-[10px]">Discount</dt>
+            <div className="flex-grow border-b border-dotted border-sage/20 mb-1 mx-2" />
             <dd>-{formatMoney(invoice.discount_amount)}</dd>
           </div>
         )}
-        <div className="flex justify-between text-espresso/60">
-          <dt>Tax</dt>
+        <div className="flex justify-between items-end text-linen/50">
+          <dt className="uppercase tracking-widest text-[10px]">Tax</dt>
+          <div className="flex-grow border-b border-dotted border-white/5 mb-1 mx-2" />
           <dd>{formatMoney(invoice.tax_amount)}</dd>
         </div>
-        <div className="flex justify-between text-base font-semibold text-espresso">
-          <dt>Total</dt>
-          <dd>{formatMoney(invoice.total)}</dd>
+        <div className="flex justify-between items-end mt-4 pt-4 border-t border-white/5 text-lg font-display text-linen">
+          <dt className="italic">Total</dt>
+          <dd className="font-body font-bold text-saffron">{formatMoney(invoice.total)}</dd>
         </div>
       </dl>
 
       {error && (
-        <p role="alert" className="mt-3 text-sm text-terracotta">
+        <p role="alert" className="mt-4 text-center text-xs font-semibold uppercase tracking-wider text-terracotta">
           {error}
         </p>
       )}
 
       {invoice.status === "paid" ? (
-        <div className="mt-4 text-center">
-          <p className="text-sm font-semibold text-sage">✓ Paid — thank you!</p>
+        <div className="mt-6 text-center">
+          <p className="font-body text-xs font-bold uppercase tracking-widest text-sage border border-sage/20 bg-sage/5 rounded-full py-2 inline-block px-6 mb-4">
+            ✓ Paid — thank you!
+          </p>
           <button
             type="button"
             onClick={onDismiss}
-            className="mt-3 text-xs font-semibold uppercase tracking-[0.1em] text-espresso/50 underline-offset-2 hover:text-espresso hover:underline"
+            className="block w-full rounded-full border border-white/10 bg-white/5 py-4 font-body text-xs font-semibold uppercase tracking-widest text-linen hover:bg-white/10 transition-colors"
           >
             Back to menu
           </button>
@@ -138,19 +143,19 @@ export function BillView({
         <button
           onClick={payOnline}
           disabled={paying}
-          className="mt-4 w-full rounded-full bg-terracotta py-3 font-body text-sm font-semibold text-linen transition-transform active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
+          className="mt-6 w-full rounded-full bg-saffron py-4 font-body text-xs font-bold uppercase tracking-widest text-espresso shadow-[0_5px_20px_rgba(231,167,58,0.3)] transition-transform active:scale-[0.98] disabled:cursor-wait disabled:opacity-50"
         >
-          {paying ? "Opening payment…" : `Pay ${formatMoney(remaining)} online`}
+          {paying ? "Opening gateway…" : `Pay ${formatMoney(remaining)} online`}
         </button>
       ) : (
         <>
           <button
             onClick={() => setDemoOpen(true)}
-            className="mt-4 w-full rounded-full bg-terracotta py-3 font-body text-sm font-semibold text-linen transition-transform active:scale-[0.99]"
+            className="mt-6 w-full rounded-full bg-saffron py-4 font-body text-xs font-bold uppercase tracking-widest text-espresso shadow-[0_5px_20px_rgba(231,167,58,0.3)] transition-transform active:scale-[0.98]"
           >
             Pay {formatMoney(remaining)} online
           </button>
-          <p className="mt-2 text-center text-[11px] text-espresso/40">
+          <p className="mt-4 text-center font-body text-[10px] leading-relaxed text-linen/30 max-w-xs mx-auto">
             Demo checkout — no real payment gateway connected yet. Or pay at the counter.
           </p>
         </>

@@ -106,7 +106,8 @@ export function OrderApp() {
     let ws: WebSocket | null = null;
 
     function connect() {
-      ws = new WebSocket(`${PUBLIC_WS_BASE_URL}/ws/orders?table=${encodeURIComponent(table)}`);
+      const wsUrl = PUBLIC_WS_BASE_URL || (window.location.protocol === "https:" ? "wss://" : "ws://") + window.location.host + "/api/public";
+      ws = new WebSocket(`${wsUrl}/ws/orders?table=${encodeURIComponent(table)}`);
       ws.onmessage = (message) => {
         try {
           const event = JSON.parse(message.data);
@@ -302,34 +303,33 @@ export function OrderApp() {
   /* ── no/invalid table ── */
   if (!table) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-espresso px-6 text-center">
-        <p className="font-body text-xs uppercase tracking-[0.35em] text-saffron">
-          {restaurantName} Table Ordering
+      <main className="flex min-h-screen flex-col items-center justify-center bg-[#0e0b08] px-6 text-center">
+        <p className="font-body text-[10px] uppercase tracking-[0.4em] text-saffron">
+          {restaurantName}
         </p>
-        <h1 className="mt-4 font-display text-3xl italic text-linen">
-          Scan the QR code on your table
+        <h1 className="mt-4 font-display text-4xl italic text-linen">
+          Scan your table code
         </h1>
-        <p className="mt-3 max-w-sm text-sm text-linen/70">
-          Each table has its own code — scanning it tells the kitchen exactly
-          where to bring your food.
+        <p className="mt-4 max-w-xs font-body text-sm font-light leading-relaxed text-linen/60">
+          Each table has its own unique QR code. Scanning it opens your dedicated luxury ordering experience.
         </p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-linen pb-32">
+    <main className="min-h-screen bg-[#0e0b08] pb-32 text-linen selection:bg-saffron selection:text-espresso">
       {/* header */}
-      <header className="sticky top-0 z-30 border-b border-espresso/10 bg-linen/95 px-4 py-3 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-white/5 bg-[#0e0b08]/80 px-4 py-3 backdrop-blur-xl shadow-sm">
         <div className="mx-auto flex max-w-lg items-center justify-between">
           <div>
-            <p className="font-display text-lg italic text-espresso">{restaurantName}</p>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-espresso/50">
-              Ordering at table <span className="font-semibold text-terracotta">{table}</span>
+            <p className="font-display text-xl italic text-linen">{restaurantName}</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-linen/50 mt-0.5">
+              Table <span className="font-semibold text-saffron">{table}</span>
             </p>
           </div>
-          <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium text-sage">
-            No app needed
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[9px] uppercase tracking-widest font-medium text-linen/70">
+            Live Order
           </span>
         </div>
       </header>
@@ -354,35 +354,35 @@ export function OrderApp() {
             {myOrders.map((order) => {
               const stepIndex = STATUS_STEPS.findIndex((s) => s.id === order.status);
               return (
-                <div key={order.id} className="rounded-2xl border border-espresso/10 bg-linen-soft p-4">
-                  <div className="flex items-baseline justify-between">
-                    <p className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-espresso/60">
-                      {order.display_code}
+                <div key={order.id} className="rounded-2xl border border-white/10 bg-[#14100b]/80 backdrop-blur-md p-5 shadow-xl">
+                  <div className="flex items-baseline justify-between mb-4">
+                    <p className="font-body text-[10px] font-semibold uppercase tracking-[0.2em] text-saffron">
+                      Order {order.display_code}
                     </p>
-                    <p className="text-xs text-espresso/50">
-                      {order.items.reduce((n, l) => n + l.quantity, 0)} items · {formatMoney(order.total)}
+                    <p className="text-[11px] uppercase tracking-widest text-linen/50">
+                      {order.items.reduce((n, l) => n + l.quantity, 0)} items · <span className="text-linen">{formatMoney(order.total)}</span>
                     </p>
                   </div>
                   {order.status === "cancelled" ? (
-                    <p className="mt-2 text-sm font-semibold text-terracotta">
-                      ✕ Cancelled — ask your server if this wasn&apos;t expected.
+                    <p className="mt-2 text-xs font-semibold text-terracotta uppercase tracking-wider">
+                      ✕ Cancelled — please ask your server.
                     </p>
                   ) : (
-                    <ol className="mt-3 flex items-center" aria-label="Order status">
+                    <ol className="flex items-center" aria-label="Order status">
                       {STATUS_STEPS.map((step, i) => {
                         const done = i <= stepIndex;
                         return (
                           <li key={step.id} className="flex flex-1 items-center last:flex-none">
-                            <span className="flex flex-col items-center gap-1">
+                            <span className="flex flex-col items-center gap-2">
                               <span
                                 aria-hidden
-                                className={`h-3 w-3 rounded-full transition-colors duration-500 ${
-                                  done ? "bg-saffron" : "bg-espresso/15"
+                                className={`h-2.5 w-2.5 rounded-full transition-all duration-700 ${
+                                  done ? "bg-saffron shadow-[0_0_8px_rgba(231,167,58,0.6)]" : "bg-white/10"
                                 }`}
                               />
                               <span
-                                className={`text-[10px] font-medium ${
-                                  done ? "text-espresso" : "text-espresso/40"
+                                className={`text-[9px] uppercase tracking-widest font-semibold transition-colors duration-700 ${
+                                  done ? "text-linen" : "text-linen/30"
                                 }`}
                               >
                                 {step.label}
@@ -391,8 +391,8 @@ export function OrderApp() {
                             {i < STATUS_STEPS.length - 1 && (
                               <span
                                 aria-hidden
-                                className={`mx-1 mb-4 h-0.5 flex-1 rounded transition-colors duration-500 ${
-                                  i < stepIndex ? "bg-saffron" : "bg-espresso/10"
+                                className={`mx-2 mb-[18px] h-[1px] flex-1 rounded transition-colors duration-700 ${
+                                  i < stepIndex ? "bg-saffron/50" : "bg-white/10"
                                 }`}
                               />
                             )}
@@ -411,7 +411,7 @@ export function OrderApp() {
         <div
           role="tablist"
           aria-label="Menu categories"
-          className="sticky top-[57px] z-20 -mx-4 mt-4 flex gap-2 overflow-x-auto bg-linen px-4 py-2"
+          className="sticky top-[60px] z-20 -mx-4 mt-2 flex gap-2 overflow-x-auto bg-[#0e0b08]/95 backdrop-blur-xl px-4 py-3 no-scrollbar shadow-[0_10px_20px_rgba(0,0,0,0.5)] border-b border-white/5"
         >
           {categories.map((cat) => (
             <button
@@ -419,10 +419,10 @@ export function OrderApp() {
               role="tab"
               aria-selected={cat.id === categoryId}
               onClick={() => setCategoryId(cat.id)}
-              className={`shrink-0 rounded-full px-4 py-2 font-body text-sm font-medium transition-colors ${
+              className={`shrink-0 rounded-full px-5 py-2 font-body text-[10px] uppercase tracking-[0.2em] font-semibold transition-all duration-300 ${
                 cat.id === categoryId
-                  ? "bg-espresso text-linen"
-                  : "bg-espresso/5 text-espresso/70"
+                  ? "bg-saffron text-espresso shadow-[0_0_15px_rgba(231,167,58,0.3)]"
+                  : "bg-white/5 text-linen/60 hover:bg-white/10 hover:text-linen border border-white/5"
               }`}
             >
               {cat.name}
@@ -431,13 +431,13 @@ export function OrderApp() {
         </div>
 
         {/* items */}
-        <ul className="mt-3 space-y-3" role="list">
+        <ul className="mt-6 space-y-4" role="list">
           {!menuLoaded &&
             Array.from({ length: 3 }).map((_, i) => (
-              <li key={i} className="h-24 animate-pulse rounded-2xl bg-espresso/5" aria-hidden />
+              <li key={i} className="h-28 animate-pulse rounded-[1.5rem] bg-white/5 border border-white/5" aria-hidden />
             ))}
           {menuLoaded && items.length === 0 && (
-            <li className="rounded-2xl border border-espresso/10 p-6 text-center text-sm text-espresso/60">
+            <li className="rounded-[1.5rem] border border-white/5 bg-[#14100b]/50 p-8 text-center font-body text-xs uppercase tracking-widest text-linen/40">
               Everything in this category just sold out — check back shortly.
             </li>
           )}
@@ -446,49 +446,51 @@ export function OrderApp() {
             return (
               <li
                 key={item.id}
-                className="flex gap-3 rounded-2xl border border-espresso/10 bg-linen-soft p-3"
+                className="flex gap-4 rounded-[1.5rem] border border-white/5 bg-gradient-to-br from-white/[0.03] to-transparent p-3 shadow-lg transition-transform active:scale-[0.98]"
               >
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl">
-                  {item.photo_url && (
+                <div className="relative h-[100px] w-[100px] shrink-0 overflow-hidden rounded-[1rem] shadow-inner">
+                  {item.photo_url ? (
                     <Image
                       src={item.photo_url}
                       alt={item.photo_alt ?? item.name}
                       fill
-                      sizes="80px"
+                      sizes="100px"
                       className="object-cover"
                     />
+                  ) : (
+                    <div className="absolute inset-0 bg-white/5" />
                   )}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h3 className="truncate font-display text-base text-espresso">{item.name}</h3>
-                    <span className="shrink-0 font-body text-sm font-semibold text-terracotta">
+                <div className="min-w-0 flex-1 flex flex-col py-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="truncate font-display text-lg text-linen leading-tight">{item.name}</h3>
+                  </div>
+                  <p className="mt-1 line-clamp-2 font-body text-[11px] font-light text-linen/50 leading-relaxed">{item.description}</p>
+                  <div className="mt-auto flex items-end justify-between">
+                    <span className="font-body text-xs font-semibold text-saffron tracking-widest">
                       {formatMoney(item.base_price)}
                     </span>
-                  </div>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-espresso/60">{item.description}</p>
-                  <div className="mt-2 flex items-center justify-end">
                     {qty === 0 ? (
                       <button
                         onClick={() => setQty(item.id, 1)}
-                        className="rounded-full bg-terracotta px-4 py-1.5 font-body text-xs font-semibold text-linen transition-transform active:scale-95"
+                        className="rounded-full border border-saffron/30 bg-saffron/10 px-5 py-1.5 font-body text-[10px] uppercase tracking-widest font-bold text-saffron transition-all hover:bg-saffron hover:text-espresso"
                       >
                         Add
                       </button>
                     ) : (
-                      <div className="flex items-center gap-3 rounded-full bg-espresso px-2 py-1">
+                      <div className="flex items-center gap-4 rounded-full border border-saffron/30 bg-saffron/10 px-2 py-1 shadow-[0_0_15px_rgba(231,167,58,0.15)]">
                         <button
                           onClick={() => setQty(item.id, qty - 1)}
                           aria-label={`Remove one ${item.name}`}
-                          className="flex h-6 w-6 items-center justify-center rounded-full text-linen"
+                          className="flex h-6 w-6 items-center justify-center rounded-full text-saffron hover:bg-saffron hover:text-espresso transition-colors"
                         >
                           −
                         </button>
-                        <span className="min-w-4 text-center text-sm font-semibold text-linen">{qty}</span>
+                        <span className="min-w-4 text-center font-body text-xs font-bold text-saffron">{qty}</span>
                         <button
                           onClick={() => setQty(item.id, qty + 1)}
                           aria-label={`Add one ${item.name}`}
-                          className="flex h-6 w-6 items-center justify-center rounded-full text-linen"
+                          className="flex h-6 w-6 items-center justify-center rounded-full text-saffron hover:bg-saffron hover:text-espresso transition-colors"
                         >
                           +
                         </button>
@@ -501,106 +503,110 @@ export function OrderApp() {
           })}
         </ul>
 
-        <p className="mt-8 text-center text-[11px] text-espresso/40">Contactless ordering</p>
+        <p className="mt-12 mb-6 text-center font-body text-[9px] uppercase tracking-[0.3em] text-linen/30">Contactless Ordering</p>
       </div>
 
       {/* cart bar */}
       {cartCount > 0 && !cartOpen && (
-        <button
-          onClick={() => setCartOpen(true)}
-          className="fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 items-center justify-between rounded-full bg-espresso px-6 py-3.5 text-linen shadow-2xl shadow-black/30 transition-transform active:scale-[0.99]"
-        >
-          <span className="font-body text-sm font-semibold">
-            {cartCount} item{cartCount > 1 ? "s" : ""} · ${cartTotal.toFixed(2)}
-          </span>
-          <span className="font-body text-sm font-semibold text-saffron">View cart →</span>
-        </button>
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-6 pt-12 bg-gradient-to-t from-[#0e0b08] via-[#0e0b08]/80 to-transparent pointer-events-none">
+          <button
+            onClick={() => setCartOpen(true)}
+            className="flex w-[calc(100%-3rem)] max-w-sm items-center justify-between rounded-full bg-saffron px-6 py-4 text-espresso shadow-[0_10px_40px_rgba(231,167,58,0.25)] transition-transform active:scale-[0.98] pointer-events-auto"
+          >
+            <span className="font-body text-[11px] uppercase tracking-widest font-bold">
+              {cartCount} item{cartCount > 1 ? "s" : ""} · {formatMoney(cartTotal)}
+            </span>
+            <span className="font-body text-[11px] uppercase tracking-widest font-bold border border-espresso/20 rounded-full px-3 py-1 bg-espresso/5">View Cart →</span>
+          </button>
+        </div>
       )}
 
       {/* cart sheet */}
       {cartOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-espresso/60 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-t-3xl bg-linen p-5 pb-8 motion-safe:animate-[fade-rise_0.35s_var(--ease-cubic)]">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl italic text-espresso">
-                Your order — table {table}
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#0e0b08]/80 backdrop-blur-md">
+          <div className="w-full max-w-lg rounded-t-[2rem] bg-[#14100b] border-t border-white/10 p-6 pb-10 shadow-[0_-20px_40px_rgba(0,0,0,0.5)] motion-safe:animate-[fade-rise_0.35s_var(--ease-cubic)]">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-display text-2xl italic text-linen">
+                Your Order <span className="text-saffron font-body not-italic text-sm ml-2">Table {table}</span>
               </h2>
               <button
                 onClick={() => setCartOpen(false)}
                 aria-label="Close cart"
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-espresso/5 text-espresso"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-linen hover:bg-white/10 transition-colors"
               >
                 ✕
               </button>
             </div>
 
-            <ul className="mt-4 max-h-56 space-y-2 overflow-y-auto" role="list">
+            <ul className="mt-6 max-h-56 space-y-4 overflow-y-auto no-scrollbar" role="list">
               {cartLines.map(({ item, qty }) => (
-                <li key={item.id} className="flex items-center justify-between gap-3">
-                  <span className="min-w-0 flex-1 truncate text-sm text-espresso">{item.name}</span>
-                  <div className="flex items-center gap-2 rounded-full bg-espresso/5 px-2 py-0.5">
+                <li key={item.id} className="flex items-center justify-between gap-4">
+                  <span className="min-w-0 flex-1 truncate font-display text-lg text-linen/90">{item.name}</span>
+                  <div className="flex items-center gap-3 rounded-full border border-saffron/20 bg-saffron/5 px-2 py-1">
                     <button
                       onClick={() => setQty(item.id, qty - 1)}
                       aria-label={`Remove one ${item.name}`}
-                      className="px-1 text-espresso"
+                      className="px-2 text-saffron"
                     >
                       −
                     </button>
-                    <span className="min-w-4 text-center text-sm font-semibold text-espresso">{qty}</span>
+                    <span className="min-w-4 text-center font-body text-xs font-bold text-saffron">{qty}</span>
                     <button
                       onClick={() => setQty(item.id, qty + 1)}
                       aria-label={`Add one ${item.name}`}
-                      className="px-1 text-espresso"
+                      className="px-2 text-saffron"
                     >
                       +
                     </button>
                   </div>
-                  <span className="w-14 text-right text-sm font-semibold text-terracotta">
+                  <span className="w-16 text-right font-body text-sm font-semibold text-saffron">
                     {formatMoney(Number(item.base_price) * qty)}
                   </span>
                 </li>
               ))}
             </ul>
 
-            <label
-              htmlFor="order-note"
-              className="mt-4 block text-xs font-medium uppercase tracking-[0.15em] text-espresso/60"
-            >
-              Note for the kitchen
-            </label>
-            <input
-              id="order-note"
-              type="text"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="No onions, extra napkins…"
-              className="mt-1.5 w-full rounded-xl border border-espresso/15 bg-white/60 px-4 py-3 text-sm text-espresso placeholder:text-espresso/40 focus:border-terracotta focus:outline-none"
-            />
+            <div className="mt-8">
+              <label
+                htmlFor="order-note"
+                className="block font-body text-[10px] font-semibold uppercase tracking-[0.2em] text-linen/40 mb-2"
+              >
+                Note for the kitchen
+              </label>
+              <input
+                id="order-note"
+                type="text"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="No onions, extra napkins…"
+                className="w-full rounded-[1rem] border border-white/10 bg-white/5 px-4 py-3 font-body text-sm text-linen placeholder:text-linen/30 focus:border-saffron focus:outline-none transition-colors"
+              />
+            </div>
 
-            <p className="mt-4 mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-espresso/60">
-              How will you pay?
+            <p className="mt-6 mb-3 block font-body text-[10px] font-semibold uppercase tracking-[0.2em] text-linen/40">
+              Payment Method
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setPaymentMethod("cash")}
                 aria-pressed={paymentMethod === "cash"}
-                className={`rounded-xl border px-3 py-2.5 text-center font-body text-sm font-semibold transition-colors ${
+                className={`rounded-[1rem] border px-4 py-3 text-center font-body text-[11px] uppercase tracking-widest font-bold transition-colors ${
                   paymentMethod === "cash"
-                    ? "border-terracotta bg-terracotta/10 text-terracotta"
-                    : "border-espresso/15 text-espresso/60"
+                    ? "border-saffron bg-saffron/10 text-saffron"
+                    : "border-white/10 bg-transparent text-linen/40"
                 }`}
               >
-                Cash / pay at counter
+                Pay at counter
               </button>
               <button
                 type="button"
                 onClick={() => setPaymentMethod("online")}
                 aria-pressed={paymentMethod === "online"}
-                className={`rounded-xl border px-3 py-2.5 text-center font-body text-sm font-semibold transition-colors ${
+                className={`rounded-[1rem] border px-4 py-3 text-center font-body text-[11px] uppercase tracking-widest font-bold transition-colors ${
                   paymentMethod === "online"
-                    ? "border-terracotta bg-terracotta/10 text-terracotta"
-                    : "border-espresso/15 text-espresso/60"
+                    ? "border-saffron bg-saffron/10 text-saffron"
+                    : "border-white/10 bg-transparent text-linen/40"
                 }`}
               >
                 Pay online now
@@ -608,7 +614,7 @@ export function OrderApp() {
             </div>
 
             {error && (
-              <p role="alert" className="mt-3 text-sm text-terracotta">
+              <p role="alert" className="mt-4 text-center text-xs font-semibold uppercase tracking-wider text-terracotta">
                 {error}
               </p>
             )}
@@ -616,20 +622,20 @@ export function OrderApp() {
             <button
               onClick={submitOrder}
               disabled={submitting}
-              className="mt-4 w-full rounded-full bg-terracotta py-3.5 font-body text-sm font-semibold text-linen transition-all active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
+              className="mt-6 w-full rounded-full bg-saffron py-4 font-body text-xs uppercase tracking-widest font-bold text-espresso shadow-[0_5px_20px_rgba(231,167,58,0.3)] transition-transform active:scale-[0.98] disabled:cursor-wait disabled:opacity-50"
             >
               {submitting
                 ? paymentMethod === "online"
-                  ? "Opening payment…"
-                  : "Sending to the kitchen…"
+                  ? "Opening gateway…"
+                  : "Sending ticket…"
                 : paymentMethod === "online"
-                  ? `Pay $${cartTotal.toFixed(2)} & place order`
-                  : `Place order · $${cartTotal.toFixed(2)}`}
+                  ? `Pay ${formatMoney(cartTotal)} & Order`
+                  : `Place Order · ${formatMoney(cartTotal)}`}
             </button>
-            <p className="mt-2 text-center text-[11px] text-espresso/40">
+            <p className="mt-4 text-center font-body text-[10px] leading-relaxed text-linen/30 max-w-xs mx-auto">
               {paymentMethod === "online"
                 ? "Your order goes to the kitchen the moment payment is confirmed."
-                : `Your food is delivered to table ${table}. Pay at the counter or ask your server.`}
+                : `Your food is delivered to Table ${table}. Pay at the counter or ask your server.`}
             </p>
           </div>
         </div>

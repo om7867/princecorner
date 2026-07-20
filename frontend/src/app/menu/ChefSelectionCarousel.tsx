@@ -53,6 +53,7 @@ const CATEGORIES = [
 
 export function ChefSelectionCarousel({ onViewFull }: { onViewFull: () => void }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export function ChefSelectionCarousel({ onViewFull }: { onViewFull: () => void }
       
       let progress = scrolled / scrollableDistance;
       progress = Math.max(0, Math.min(1, progress));
+      setScrollProgress(progress);
       
       // Map progress to active index (e.g., 0-0.25 is index 0)
       const newIndex = Math.min(
@@ -150,28 +152,30 @@ export function ChefSelectionCarousel({ onViewFull }: { onViewFull: () => void }
                       priority={index === 0}
                       unoptimized={true}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#14100b] to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-[#14100b]/90" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#14100b] via-[#14100b]/40 to-black/30 sm:bg-gradient-to-r sm:from-black/30 sm:via-[#14100b]/40 sm:to-[#14100b]/90" />
                   </div>
 
                   {/* Menu Items Info Box */}
-                  <div className="flex-1 flex flex-col justify-center p-6 sm:p-12 relative z-10 bg-[#14100b]/80 sm:bg-transparent">
-                    <h3 className={`font-display text-5xl sm:text-6xl italic text-linen mb-6 sm:mb-8 transition-transform duration-700 delay-300 ${isActive ? "translate-x-0 opacity-100" : "translate-x-8 opacity-0"}`}>
+                  <div className="flex-1 flex flex-col justify-center px-6 pb-6 sm:p-12 relative z-10 bg-gradient-to-t from-[#14100b] via-[#14100b] to-transparent sm:bg-none -mt-20 sm:mt-0 pt-20 sm:pt-12">
+                    <h3 className={`font-display text-5xl sm:text-6xl italic text-linen mb-6 sm:mb-8 transition-transform duration-700 delay-300 drop-shadow-lg ${isActive ? "translate-x-0 opacity-100" : "translate-x-8 opacity-0"}`}>
                       {category.title}
                     </h3>
 
-                    <ul className="space-y-4">
+                    <ul className="space-y-3 sm:space-y-4 w-full">
                       {category.items.map((item, itemIndex) => (
                         <li 
                           key={item.name} 
-                          className={`flex justify-between items-baseline border-b border-white/10 pb-2 transition-all duration-500`}
+                          className={`flex items-end gap-3 sm:gap-4 transition-all duration-500 w-full`}
                           style={{ 
                             transitionDelay: isActive ? `${500 + itemIndex * 100}ms` : '0ms',
                             opacity: isActive ? 1 : 0,
                             transform: isActive ? 'translateY(0)' : 'translateY(10px)'
                           }}
                         >
-                          <span className="font-display text-lg text-linen">{item.name}</span>
-                          <span className="font-body text-sm font-medium text-saffron tracking-wider">
+                          <span className="font-display text-lg sm:text-xl text-linen/90 whitespace-nowrap">{item.name}</span>
+                          {/* Premium Menu Dotted Leader */}
+                          <div className="flex-grow border-b-2 border-dotted border-white/10 mb-[6px] sm:mb-[8px]" />
+                          <span className="font-body text-sm sm:text-base font-medium text-saffron tracking-widest whitespace-nowrap">
                             {formatMoney(item.price)}
                           </span>
                         </li>
@@ -192,21 +196,39 @@ export function ChefSelectionCarousel({ onViewFull }: { onViewFull: () => void }
             })}
           </div>
           
-          {/* Progress Indicators */}
+          {/* Continuous Progress Indicators */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-3">
-            {CATEGORIES.map((_, index) => (
-              <div
-                key={index}
-                className="group relative h-1.5 w-12 sm:w-16 overflow-hidden rounded-full bg-white/20 transition-all"
-              >
-                <div 
-                  className="absolute inset-y-0 left-0 bg-saffron transition-all duration-500"
-                  style={{
-                    width: index === activeIndex ? '100%' : index < activeIndex ? '100%' : '0%'
-                  }}
-                />
-              </div>
-            ))}
+            {CATEGORIES.map((_, index) => {
+              const sectionSize = 1 / CATEGORIES.length;
+              const sectionStart = index * sectionSize;
+              const sectionEnd = (index + 1) * sectionSize;
+              
+              let fillPercent = 0;
+              if (scrollProgress >= sectionEnd) fillPercent = 100;
+              else if (scrollProgress > sectionStart) {
+                fillPercent = ((scrollProgress - sectionStart) / sectionSize) * 100;
+              }
+
+              return (
+                <div
+                  key={index}
+                  className="group relative h-1.5 w-12 sm:w-16 overflow-hidden rounded-full bg-white/20"
+                >
+                  <div 
+                    className="absolute inset-y-0 left-0 bg-saffron"
+                    style={{ width: `${fillPercent}%` }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Prominent Center Scroll Hint */}
+          <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-3 opacity-90 animate-bounce pointer-events-none">
+            <div className="bg-[#0e0b08]/80 backdrop-blur-md border border-white/10 px-5 py-3 rounded-full flex flex-col items-center gap-2 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+              <span className="font-body text-[10px] uppercase tracking-[0.4em] text-saffron font-bold">Keep Scrolling</span>
+              <div className="w-[2px] h-6 bg-saffron rounded-full" />
+            </div>
           </div>
 
         </div>
