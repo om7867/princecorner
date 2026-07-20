@@ -16,6 +16,7 @@ node_modules/
 # next.js
 frontend/.next/
 frontend/out/
+.next/
 
 # production
 /build
@@ -42,6 +43,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 frontend/next-env.d.ts
+next-env.d.ts
+
+# local demo data
+.demo-db.json
 
 # python / backend
 backend/.venv/

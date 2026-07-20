@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { API_BASE_URL } from "@/lib/env";
 import { getSiteSettings } from "@/lib/site-settings";
 import type { MenuItemDTO } from "@/lib/types";
-import { WorldCanvas } from "@/scenes/core/WorldCanvas";
-import { MenuHubWorld, MENU_KEYFRAMES } from "@/scenes/worlds/MenuHubWorld";
 import { MenuHub } from "./MenuHub";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,8 +15,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 
 async function getMenuItems(): Promise<MenuItemDTO[]> {
-  const res = await fetch(`${API_BASE_URL}/menu`, { next: { revalidate: 10 } });
-  return res.ok ? res.json() : [];
+  try {
+    const res = await fetch(`${API_BASE_URL}/menu`, { next: { revalidate: 10 } });
+    return res.ok ? res.json() : [];
+  } catch (error) {
+    console.error("Failed to fetch menu items:", error);
+    return []; // Return empty array to allow graceful degradation/mock data fallback
+  }
 }
 
 export default async function MenuHubPage() {
@@ -26,12 +29,6 @@ export default async function MenuHubPage() {
 
   return (
     <>
-      <WorldCanvas
-        keyframes={MENU_KEYFRAMES}
-        backdrop="bg-gradient-to-b from-[#1c1610] via-[#14100b] to-[#0e0b08]"
-      >
-        <MenuHubWorld />
-      </WorldCanvas>
       <MenuHub items={items} siteName={settings.name} />
     </>
   );

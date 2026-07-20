@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { PUBLIC_API_BASE_URL } from "@/lib/env";
 import { formatMoney } from "@/lib/types";
 import type { CategoryDTO, MenuItemDTO } from "@/lib/types";
-import { useMediaCapability } from "@/lib/use-media-capability";
-import { PhotoDishScene } from "@/components/scenes/PhotoDishScene";
-import { Reveal } from "@/components/ui/Reveal";
+import { MOCK_CATEGORIES } from "@/data/mockMenu";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const DIETARY_LABEL: Record<string, string> = {
   vegetarian: "Vegetarian",
@@ -17,89 +17,70 @@ const DIETARY_LABEL: Record<string, string> = {
 };
 
 export function MenuShowcase({ items: allItems }: { items: MenuItemDTO[] }) {
-  const capability = useMediaCapability();
   const [categories, setCategories] = useState<CategoryDTO[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
-  const cardRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
     fetch(`${PUBLIC_API_BASE_URL}/menu/categories`)
       .then((r) => r.json())
       .then((cats: CategoryDTO[]) => {
-        setCategories(cats);
-        setActiveCategoryId((cur) => cur ?? cats[0]?.id ?? null);
+        const usingMockItems = allItems.length > 0 && allItems[0].id === "item-1";
+        if (!usingMockItems && cats && cats.length > 0) {
+          setCategories(cats);
+          setActiveCategoryId((cur) => cur ?? cats[0]?.id ?? null);
+        } else {
+          setCategories(MOCK_CATEGORIES);
+          setActiveCategoryId((cur) => cur ?? MOCK_CATEGORIES[0]?.id ?? null);
+        }
       })
-      .catch(() => {});
+      .catch(() => {
+        setCategories(MOCK_CATEGORIES);
+        setActiveCategoryId((cur) => cur ?? MOCK_CATEGORIES[0]?.id ?? null);
+      });
+  }, [allItems]);
+
+  const activeItems = allItems.filter((item) => item.category_id === activeCategoryId);
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  
+  // The image to display: if hovering, show the hovered item's image. Otherwise, show the first item's image.
+  const displayItem = activeItems.find(i => i.id === hoveredItemId) || activeItems[0];
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    // Subtle fade in for the whole section (Desktop)
+    gsap.matchMedia().add("(min-width: 1024px)", () => {
+      gsap.fromTo(".menu-fade-up", 
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 1.5, stagger: 0.2, ease: "power3.out", scrollTrigger: { trigger: "#menu", start: "top 75%" } }
+      );
+    });
   }, []);
 
-  const items = useMemo(
-    () => allItems.filter((item) => item.category_id === activeCategoryId),
-    [allItems, activeCategoryId]
-  );
-
-  const [selectedId, setSelectedId] = useState<string | undefined>(items[0]?.id);
-  const selected = items.find((i) => i.id === selectedId) ?? items[0];
-
-  function selectCategory(categoryId: string) {
-    setActiveCategoryId(categoryId);
-    const first = allItems.find((i) => i.category_id === categoryId);
-    setSelectedId(first?.id);
-  }
-
-  function handleCardKeyDown(e: React.KeyboardEvent, index: number) {
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-      e.preventDefault();
-      const next = cardRefs.current[(index + 1) % items.length];
-      next?.focus();
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-      e.preventDefault();
-      const prev = cardRefs.current[(index - 1 + items.length) % items.length];
-      prev?.focus();
-    }
-  }
-
-  const show3D = capability.ready && capability.canRender3D;
-
   return (
-    <section
-      id="menu"
-      aria-label="Menu"
-      className="relative bg-linen px-6 py-24 sm:py-32"
-    >
-      <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <div className="text-center">
-            <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
-              The Menu
-            </p>
-            <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso sm:text-5xl">
-              Made slow, served warm
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-balance text-espresso/70">
-              A short menu, changed with the seasons — every plate finished by
-              hand before it reaches your table.
-            </p>
-          </div>
-        </Reveal>
+    <section id="menu" aria-label="Menu" className="bg-linen py-24 sm:py-32 overflow-hidden">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="menu-fade-up mb-12 lg:mb-24 text-center lg:text-left">
+          <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
+            Our Menu
+          </p>
+          <h2 className="mt-4 font-display text-4xl italic text-espresso sm:text-6xl">
+            A curated tasting experience
+          </h2>
+        </div>
+      </div>
 
-        {/* Category tabs */}
-        <div
-          role="tablist"
-          aria-label="Menu categories"
-          className="mt-12 flex flex-wrap items-center justify-center gap-2"
-        >
+      {/* MOBILE: Immersive Horizontal Snap Scrolling Feed */}
+      <div className="lg:hidden w-full relative">
+        {/* Category Pill Scroll */}
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-6 pb-6 no-scrollbar">
           {categories.map((cat) => {
             const isActive = cat.id === activeCategoryId;
             return (
               <button
                 key={cat.id}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => selectCategory(cat.id)}
-                className={`rounded-full px-5 py-2 font-body text-sm font-medium tracking-wide transition-all duration-300 ease-[var(--ease-cubic)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta ${
-                  isActive
-                    ? "bg-espresso text-linen shadow-md"
-                    : "bg-espresso/5 text-espresso/70 hover:bg-espresso/10"
+                onClick={() => setActiveCategoryId(cat.id)}
+                className={`snap-start shrink-0 rounded-full px-6 py-3 text-sm font-semibold tracking-wider uppercase transition-all duration-300 ${
+                  isActive ? "bg-espresso text-linen shadow-lg" : "bg-espresso/5 text-espresso/60 border border-espresso/10"
                 }`}
               >
                 {cat.name}
@@ -108,124 +89,143 @@ export function MenuShowcase({ items: allItems }: { items: MenuItemDTO[] }) {
           })}
         </div>
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-          {/* 3D / static spotlight */}
-          <div className="relative mx-auto h-72 w-full max-w-md overflow-hidden rounded-3xl bg-gradient-to-b from-espresso-soft to-espresso sm:h-96 lg:mx-0">
-            {/* Blurred photo backdrop sets the mood behind the 3D dish */}
-            {selected?.photo_url && (
-              <Image
-                key={selected.id}
-                src={selected.photo_url}
-                alt=""
-                aria-hidden
-                fill
-                priority
-                sizes="(max-width: 640px) 100vw, 448px"
-                className="scale-110 object-cover opacity-40 blur-md"
-              />
-            )}
-            <div
-              aria-hidden
-              className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,_rgba(231,167,58,0.18),_transparent_65%)]"
-            />
-            {/* The dish photo itself, floating as a 3D object */}
-            {show3D && selected?.photo_url ? (
-              <div aria-hidden className="absolute inset-0">
-                <PhotoDishScene
-                  url={selected.photo_url}
-                  reducedMotion={capability.reducedMotion}
-                  cameraZ={5.6}
-                />
-              </div>
-            ) : (
-              selected?.photo_url && (
-                <Image
-                  src={selected.photo_url}
-                  alt={selected.photo_alt ?? selected.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, 448px"
-                  className="object-cover"
-                />
-              )
-            )}
-            {selected && (
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-baseline justify-between bg-gradient-to-t from-espresso/80 to-transparent px-6 pb-5 pt-10">
-                <span className="font-display text-2xl italic text-linen">
-                  {selected.name}
-                </span>
-                <span className="font-body text-sm font-semibold text-saffron">
-                  {formatMoney(selected.base_price)}
-                </span>
-              </div>
-            )}
-          </div>
+        {/* Readable Vertical Menu with Inline Image Reveal */}
+        <div className="flex flex-col gap-6 px-6 pb-12">
+          {activeItems.map((item) => {
+            const isExpanded = hoveredItemId === item.id;
+            return (
+              <div 
+                key={item.id} 
+                onClick={() => setHoveredItemId(isExpanded ? null : item.id)}
+                className="flex flex-col gap-4 border-b border-espresso/10 pb-6 transition-all duration-300"
+              >
+                {/* The readable text row */}
+                <div className="flex justify-between items-baseline gap-4 cursor-pointer">
+                  <h3 className="font-display text-2xl text-espresso">
+                    {item.name}
+                  </h3>
+                  <span className="font-body text-base font-bold tracking-widest text-terracotta whitespace-nowrap">
+                    {formatMoney(item.base_price)}
+                  </span>
+                </div>
+                
+                <p className="text-sm leading-relaxed text-espresso/70 pr-4">
+                  {item.description}
+                </p>
 
-          {/* Accessible, keyboard-navigable item list — this is the real
-              interactive surface; the 3D panel is a decorative mirror. */}
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1" role="list">
-            {items.map((item, index) => {
-              const isSelected = item.id === selected?.id;
-              return (
-                <li key={item.id}>
-                  <button
-                    ref={(el) => {
-                      cardRefs.current[index] = el;
-                    }}
-                    type="button"
-                    onClick={() => setSelectedId(item.id)}
-                    onFocus={() => setSelectedId(item.id)}
-                    onMouseEnter={() => setSelectedId(item.id)}
-                    onKeyDown={(e) => handleCardKeyDown(e, index)}
-                    aria-pressed={isSelected}
-                    className={`w-full rounded-2xl border px-5 py-4 text-left transition-all duration-300 ease-[var(--ease-cubic)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta ${
-                      isSelected
-                        ? "border-terracotta bg-terracotta/5 shadow-sm"
-                        : "border-espresso/10 hover:border-espresso/25"
-                    }`}
-                  >
-                    <div className="flex gap-4">
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-                        {item.photo_url && (
-                          <Image
-                            src={item.photo_url}
-                            alt={item.photo_alt ?? item.name}
-                            fill
-                            sizes="64px"
-                            className="object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-4">
-                          <span className="font-display text-lg text-espresso">
-                            {item.name}
-                          </span>
-                          <span className="shrink-0 font-body text-sm font-semibold text-terracotta">
-                            {formatMoney(item.base_price)}
-                          </span>
-                        </div>
-                        <p className="mt-1.5 text-sm text-espresso/70">
-                          {item.description}
-                        </p>
-                        {item.dietary_tags.length > 0 && (
-                          <div className="mt-2.5 flex flex-wrap gap-1.5">
-                            {item.dietary_tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="rounded-full bg-sage/10 px-2.5 py-0.5 text-xs font-medium text-sage"
-                              >
-                                {DIETARY_LABEL[tag]}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                {item.dietary_tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {item.dietary_tags.map((tag) => (
+                      <span key={tag} className="text-[10px] font-bold uppercase tracking-[0.2em] text-espresso/50 border border-espresso/10 rounded-full px-2 py-0.5">
+                        {DIETARY_LABEL[tag]}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Unique Mobile Inline Image Expansion */}
+                <div 
+                  className={`relative w-full rounded-2xl overflow-hidden transition-all duration-700 ease-[var(--ease-cubic)] ${
+                    isExpanded ? "h-[40vh] mt-4 opacity-100" : "h-0 mt-0 opacity-0"
+                  }`}
+                >
+                  {item.photo_url ? (
+                    <Image
+                      src={item.photo_url}
+                      alt={item.photo_alt || item.name}
+                      fill
+                      sizes="90vw"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-charcoal flex items-center justify-center">
+                      <span className="text-linen/50 italic font-display">Signature</span>
                     </div>
-                  </button>
-                </li>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* DESKTOP: Split-Screen Hover Experience */}
+      <div className="hidden lg:grid max-w-7xl mx-auto px-6 lg:grid-cols-2 gap-24 items-start">
+        {/* LEFT: Sticky Image Display */}
+        <div className="menu-fade-up sticky top-32 h-[75vh] w-full rounded-3xl overflow-hidden shadow-2xl">
+          <div className="relative w-full h-full">
+            {displayItem?.photo_url ? (
+              <Image
+                src={displayItem.photo_url}
+                alt={displayItem.photo_alt || displayItem.name}
+                fill
+                sizes="50vw"
+                className="object-cover transition-opacity duration-700 ease-[var(--ease-cubic)]"
+                priority
+              />
+            ) : (
+              <div className="w-full h-full bg-espresso/5 flex items-center justify-center">
+                <span className="font-display italic text-espresso/40 text-2xl">Signature Dish</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-espresso/40 to-transparent pointer-events-none" />
+          </div>
+        </div>
+
+        {/* RIGHT: Menu Categories & Items */}
+        <div className="flex flex-col">
+          {/* Category Tabs */}
+          <div className="menu-fade-up flex flex-wrap gap-6 border-b border-espresso/10 pb-6 mb-12">
+            {categories.map((cat) => {
+              const isActive = cat.id === activeCategoryId;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategoryId(cat.id)}
+                  className={`font-body text-sm uppercase tracking-[0.2em] transition-all duration-500 ease-out ${
+                    isActive ? "text-espresso font-semibold" : "text-espresso/40 hover:text-espresso/70"
+                  }`}
+                >
+                  {cat.name}
+                  {isActive && <div className="mt-2 h-0.5 w-full bg-terracotta" />}
+                </button>
               );
             })}
-          </ul>
+          </div>
+
+          {/* Menu List */}
+          <div className="flex flex-col gap-10">
+            {activeItems.map((item) => (
+              <div 
+                key={item.id}
+                onMouseEnter={() => setHoveredItemId(item.id)}
+                onMouseLeave={() => setHoveredItemId(null)}
+                className="group cursor-pointer menu-fade-up"
+              >
+                <div className="flex items-baseline justify-between gap-4 border-b border-transparent transition-colors duration-500 group-hover:border-espresso/20 pb-4">
+                  <h3 className="font-display text-2xl text-espresso transition-transform duration-500 group-hover:translate-x-2">
+                    {item.name}
+                  </h3>
+                  <span className="font-body text-sm font-semibold tracking-widest text-terracotta">
+                    {formatMoney(item.base_price)}
+                  </span>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-espresso/70 transition-transform duration-500 group-hover:translate-x-2">
+                  {item.description}
+                </p>
+
+                {item.dietary_tags.length > 0 && (
+                  <div className="mt-4 flex gap-3 transition-transform duration-500 group-hover:translate-x-2">
+                    {item.dietary_tags.map((tag) => (
+                      <span key={tag} className="text-[10px] uppercase tracking-[0.1em] text-espresso/50 border border-espresso/10 rounded-full px-2 py-0.5">
+                        {DIETARY_LABEL[tag]}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

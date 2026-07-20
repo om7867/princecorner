@@ -66,9 +66,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-linen text-charcoal font-body">
+      <body suppressHydrationWarning className="min-h-full bg-linen text-charcoal font-body">
         <RestaurantJsonLd />
         <SiteChrome>{children}</SiteChrome>
       </body>

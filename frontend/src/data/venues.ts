@@ -35,12 +35,12 @@ export const VENUES: Venue[] = [
     },
     gallery: [
       {
-        src: unsplash("1504674900247-0877df9cc836"),
-        alt: "Fine-dining plates with herbs on a rustic table",
+        src: unsplash("1631515243349-e0cb75fb8d3a"),
+        alt: "Fine-dining Indian vegetarian thali",
       },
       {
-        src: unsplash("1544025162-d76694265947"),
-        alt: "Slow-roasted meat on a wooden serving board",
+        src: unsplash("1585937421612-70a008356fbe"),
+        alt: "Rich paneer delicacy on a rustic table",
       },
       {
         src: unsplash("1512621776951-a57141f2eefd"),
@@ -48,10 +48,10 @@ export const VENUES: Venue[] = [
       },
     ],
     featuredIds: [
-      "charred-octopus",
-      "slow-roasted-lamb",
+      "truffle-pav-bhaji",
+      "smoked-paneer-tikka",
       "wild-mushroom-risotto",
-      "seared-catch",
+      "saffron-pulav",
     ],
     quickInfo: {
       hours: "Tue – Sun · from 5:30 pm",
@@ -138,7 +138,7 @@ export const VENUES: Venue[] = [
     featuredIds: [
       "smoked-old-fashioned",
       "sage-garden-fizz",
-      "charred-octopus",
+      "truffle-fries",
       "dark-chocolate-tart",
     ],
     quickInfo: {
@@ -211,9 +211,9 @@ export const RESTAURANT_TASTING = {
   note: "Five courses, changed with the market. Wine pairing available.",
   courses: [
     { order: "I", name: "To Begin", dish: "Three-day sourdough, whipped cultured butter" },
-    { order: "II", name: "The Sea", dish: "Charred octopus, smoked paprika, charred lemon" },
+    { order: "II", name: "The Earth", dish: "Smoked paneer, charred pepper puree, mint oil" },
     { order: "III", name: "The Field", dish: "Wild mushroom risotto, black truffle, aged parmesan" },
-    { order: "IV", name: "The Land", dish: "Eight-hour lamb shoulder, rosemary jus, sage butter" },
+    { order: "IV", name: "The Hearth", dish: "Heritage saffron pulav, slow-cooked dal makhani" },
     { order: "V", name: "To Finish", dish: "Dark chocolate tart, espresso crust, sea salt" },
   ],
 };

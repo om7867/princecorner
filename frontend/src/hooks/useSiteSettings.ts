@@ -15,6 +15,9 @@ export function useSiteSettings(): { settings: SiteSettingsDTO | null; loaded: b
       .then((data: SiteSettingsDTO) => {
         if (!cancelled) setSettings(data);
       })
+      .catch((e) => {
+        console.warn("Failed to fetch site settings:", e);
+      })
       .finally(() => {
         if (!cancelled) setLoaded(true);
       });

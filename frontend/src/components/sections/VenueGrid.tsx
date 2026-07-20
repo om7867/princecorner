@@ -1,82 +1,132 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { VENUES } from "@/data/venues";
-import { Reveal } from "@/components/ui/Reveal";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function VenueGrid() {
+  const containerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    if (!containerRef.current) return;
+
+    const ctx = gsap.context(() => {
+      const cards = gsap.utils.toArray(".venue-stack-card") as HTMLElement[];
+      const mm = gsap.matchMedia();
+
+      // Desktop: Stacking Cards with Pinning
+      mm.add("(min-width: 1024px)", () => {
+        cards.forEach((card, i) => {
+          if (i === cards.length - 1) return; // Don't animate the last card out
+          
+          gsap.to(card, {
+            scale: 0.9,
+            opacity: 0,
+            scrollTrigger: {
+              trigger: card,
+              start: "top top+=100", // Start pinning slightly below top
+              end: "bottom top",
+              pin: true,
+              pinSpacing: false,
+              scrub: true,
+            }
+          });
+        });
+      });
+      // (No GSAP needed for mobile; pure CSS snap scrolling is used)
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
       id="spaces"
+      ref={containerRef}
       aria-label="Our spaces"
-      className="bg-linen-soft px-6 py-24 sm:py-32"
+      className="bg-linen-soft py-24 sm:py-32 overflow-hidden"
     >
-      <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <div className="text-center">
-            <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
-              Four Rooms, One Table
-            </p>
-            <h2 className="mt-4 text-balance font-display text-4xl italic text-espresso sm:text-5xl">
-              Explore our spaces
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-balance text-espresso/70">
-              Restaurant, café, bar, and bakery — each with its own light, its
-              own pace, and its own 3D story. Step inside.
-            </p>
-          </div>
-        </Reveal>
+      <div className="mx-auto max-w-5xl px-6 mb-16 lg:mb-24 text-center">
+        <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
+          Four Rooms, One Table
+        </p>
+        <h2 className="mt-4 font-display text-4xl italic text-espresso sm:text-6xl">
+          Explore our spaces
+        </h2>
+      </div>
 
-        <Reveal stagger>
-        <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" role="list">
-          {VENUES.map((venue) => (
-            <li key={venue.slug}>
-              <Link
-                href={`/${venue.slug}`}
-                className="group block overflow-hidden rounded-3xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta"
-              >
-                <div className="relative aspect-[3/4]">
-                  <Image
-                    src={venue.heroPhoto.src}
-                    alt={venue.heroPhoto.alt}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-700 ease-[var(--ease-cubic)] group-hover:scale-105"
-                  />
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-gradient-to-t from-espresso/90 via-espresso/20 to-transparent"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 p-6">
-                    <h3 className="font-display text-2xl italic text-linen">
-                      {venue.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-linen/80">{venue.tagline}</p>
-                    <span className="mt-4 inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-saffron">
-                      Step inside
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        aria-hidden
-                        className="transition-transform duration-300 ease-[var(--ease-cubic)] group-hover:translate-x-1"
-                      >
-                        <path
-                          d="M2 7H12M12 7L8 3M12 7L8 11"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </div>
+      {/* MOBILE: Horizontal Swipe Carousel */}
+      <div className="lg:hidden w-full relative">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 px-6 pb-12 no-scrollbar">
+          {VENUES.map((venue, index) => (
+            <div 
+              key={venue.slug} 
+              className="snap-center shrink-0 relative h-[60vh] min-h-[450px] w-[85vw] max-w-sm shadow-2xl rounded-3xl overflow-hidden bg-espresso active:scale-[0.98] transition-transform duration-300"
+            >
+              <Link href={`/${venue.slug}`} className="block h-full w-full">
+                <Image
+                  src={venue.heroPhoto.src}
+                  alt={venue.heroPhoto.alt}
+                  fill
+                  sizes="85vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-espresso via-espresso/30 to-transparent opacity-90" />
+                
+                <div className="absolute inset-0 flex flex-col items-center justify-end text-center p-8 pb-12">
+                  <span className="font-body text-[10px] font-bold uppercase tracking-[0.3em] text-saffron mb-3 opacity-90 border border-saffron/30 rounded-full px-3 py-1 backdrop-blur-sm bg-black/20">
+                    0{index + 1}
+                  </span>
+                  <h3 className="font-display text-3xl italic text-linen">
+                    {venue.name}
+                  </h3>
+                  <p className="mt-3 text-sm text-linen/80 font-body line-clamp-3">
+                    {venue.tagline}
+                  </p>
                 </div>
               </Link>
-            </li>
+            </div>
           ))}
-        </ul>
-        </Reveal>
+        </div>
+      </div>
+
+      {/* DESKTOP: Cinematic Stacking Cards */}
+      <div className="hidden lg:block mx-auto max-w-4xl px-6 relative">
+        {VENUES.map((venue, index) => (
+          <div 
+            key={venue.slug} 
+            className="venue-stack-card w-full mb-32 shadow-2xl rounded-[2rem] overflow-hidden bg-espresso"
+            style={{ zIndex: index + 1 }}
+          >
+            <Link href={`/${venue.slug}`} className="group block relative aspect-[4/3] md:aspect-video w-full">
+              <Image
+                src={venue.heroPhoto.src}
+                alt={venue.heroPhoto.alt}
+                fill
+                sizes="(max-width: 1024px) 100vw, 896px"
+                className="object-cover transition-transform duration-1000 ease-[var(--ease-cubic)] group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-espresso via-espresso/20 to-transparent opacity-80" />
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 transition-transform duration-700">
+                <span className="font-body text-xs font-semibold uppercase tracking-[0.3em] text-saffron mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                  Step Inside
+                </span>
+                <h3 className="font-display text-4xl italic text-linen md:text-6xl">
+                  {venue.name}
+                </h3>
+                <p className="mt-6 max-w-md text-base text-linen/70 font-body">
+                  {venue.tagline}
+                </p>
+              </div>
+            </Link>
+          </div>
+        ))}
       </div>
     </section>
   );

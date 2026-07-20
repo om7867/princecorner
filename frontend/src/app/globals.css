@@ -40,8 +40,12 @@
 
 @layer base {
   * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-terracotta) transparent;
+    /* Hide scrollbar globally across the site */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  *::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
 
   html {
@@ -62,6 +66,15 @@
   .scrim-b {
     -webkit-mask-image: linear-gradient(to top, black 55%, transparent 100%);
     mask-image: linear-gradient(to top, black 55%, transparent 100%);
+  }
+
+  /* Hide scrollbar for immersive touch carousels */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   /*
@@ -174,6 +187,25 @@
 }
 
 /*
+  Premium Luxury Hover
+  A CSS-only interactive state that avoids JS overhead.
+  Provides a slight float, minimal scale, and elevated soft shadow using Power3 easing.
+*/
+.premium-hover {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow;
+}
+.premium-hover:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+}
+.premium-hover:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/*
   Animated film grain — laid over the footage only, never the content.
   Discrete jumps (steps) rather than smooth drift: real grain doesn't glide.
 */
@@ -226,14 +258,23 @@
   }
 }
 
+.animate-marquee-images {
+  animation: marquee-images 35s linear infinite;
+}
+@keyframes marquee-images {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
 /*
   Scroll-entrance reveals, driven by the Reveal component adding
   `.is-visible` when a panel crosses the viewport. Pure opacity/transform
   so nothing reflows; expo ease-out for a confident, settled landing.
 */
 .reveal {
-  opacity: 0;
-  transform: translateY(22px);
+  opacity: 1;
+  transform: none;
   transition:
     opacity 0.7s var(--ease-out-expo),
     transform 0.7s var(--ease-out-expo);
@@ -248,8 +289,8 @@
   element's children cascade in 60ms apart.
 */
 .reveal-stagger > * > * {
-  opacity: 0;
-  transform: translateY(18px);
+  opacity: 1;
+  transform: none;
   transition:
     opacity 0.6s var(--ease-out-expo),
     transform 0.6s var(--ease-out-expo);
