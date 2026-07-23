@@ -19,6 +19,7 @@ class CouponRead(BaseModel):
     usage_limit: int | None
     times_used: int
     is_active: bool
+    source_global_coupon_id: str | None = None
 
 
 class CouponCreate(BaseModel):

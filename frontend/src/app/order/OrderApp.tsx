@@ -23,7 +23,20 @@ const STATUS_STEPS: { id: OrderStatus; label: string }[] = [
 export function OrderApp() {
   const params = useSearchParams();
   const table = (params.get("table") ?? "").toUpperCase();
+  const restaurantSlug = params.get("r") ?? "";
   const { settings } = useSiteSettings();
+
+  // Appends `restaurant=<slug>` (as `&` or the first `?`, whichever fits the
+  // URL) only when this table's QR code carried an `r` param — omitted
+  // entirely otherwise, so it stays backward-compatible with QR codes
+  // printed before multi-branch support existed.
+  const withRestaurant = useCallback(
+    (url: string) =>
+      restaurantSlug
+        ? `${url}${url.includes("?") ? "&" : "?"}restaurant=${encodeURIComponent(restaurantSlug)}`
+        : url,
+    [restaurantSlug]
+  );
 
   const [menu, setMenu] = useState<MenuItemDTO[]>([]);
   const [categories, setCategories] = useState<CategoryDTO[]>([]);
@@ -44,24 +57,24 @@ export function OrderApp() {
   const invoiceStorageKey = `guest-invoice-${table}`;
 
   const loadMenu = useCallback(() => {
-    fetch(`${PUBLIC_API_BASE_URL}/menu`)
+    fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/menu`))
       .then((r) => r.json())
       .then((items: MenuItemDTO[]) => {
         setMenu(items);
         setMenuLoaded(true);
       })
       .catch(() => setMenuLoaded(true));
-  }, []);
+  }, [withRestaurant]);
 
   useEffect(() => {
-    fetch(`${PUBLIC_API_BASE_URL}/menu/categories`)
+    fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/menu/categories`))
       .then((r) => r.json())
       .then((cats: CategoryDTO[]) => {
         setCategories(cats);
         setCategoryId((cur) => cur ?? cats[0]?.id ?? null);
       })
       .catch(() => {});
-  }, []);
+  }, [withRestaurant]);
 
   // initial load: menu + my previous orders this session
   useEffect(() => {
@@ -73,7 +86,7 @@ export function OrderApp() {
     } catch {
       /* ignore */
     }
-    fetch(`${PUBLIC_API_BASE_URL}/orders?table=${encodeURIComponent(table)}`)
+    fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/orders?table=${encodeURIComponent(table)}`))
       .then((r) => r.json())
       .then((orders: OrderDTO[]) => {
         setMyOrders(orders.filter((o) => myOrderIds.current.has(o.id)));
@@ -85,7 +98,7 @@ export function OrderApp() {
     // seated at this table later doesn't see the previous guest's paid bill.
     const savedInvoiceId = localStorage.getItem(invoiceStorageKey);
     if (savedInvoiceId) {
-      fetch(`${PUBLIC_API_BASE_URL}/invoices/${savedInvoiceId}`)
+      fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/invoices/${savedInvoiceId}`))
         .then((r) => (r.ok ? r.json() : null))
         .then((data: InvoiceDTO | null) => {
           if (data && data.status !== "paid" && data.status !== "refunded") {
@@ -96,7 +109,7 @@ export function OrderApp() {
         })
         .catch(() => {});
     }
-  }, [table, storageKey, invoiceStorageKey, loadMenu]);
+  }, [table, storageKey, invoiceStorageKey, loadMenu, withRestaurant]);
 
   // real-time: my order status + menu 86 updates
   useEffect(() => {
@@ -107,7 +120,7 @@ export function OrderApp() {
 
     function connect() {
       const wsUrl = PUBLIC_WS_BASE_URL || (window.location.protocol === "https:" ? "wss://" : "ws://") + window.location.host + "/api/public";
-      ws = new WebSocket(`${wsUrl}/ws/orders?table=${encodeURIComponent(table)}`);
+      ws = new WebSocket(withRestaurant(`${wsUrl}/ws/orders?table=${encodeURIComponent(table)}`));
       ws.onmessage = (message) => {
         try {
           const event = JSON.parse(message.data);
@@ -146,7 +159,7 @@ export function OrderApp() {
       closedByUs = true;
       ws?.close();
     };
-  }, [table, loadMenu, invoiceStorageKey]);
+  }, [table, loadMenu, invoiceStorageKey, withRestaurant]);
 
   const items = useMemo(
     () => menu.filter((m) => m.category_id === categoryId),
@@ -201,7 +214,7 @@ export function OrderApp() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch(`${PUBLIC_API_BASE_URL}/orders`, {
+      const res = await fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/orders`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(cartPayload()),
@@ -233,7 +246,7 @@ export function OrderApp() {
       }
 
       const payload = cartPayload();
-      const prepRes = await fetch(`${PUBLIC_API_BASE_URL}/orders/prepare-payment`, {
+      const prepRes = await fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/orders/prepare-payment`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -259,7 +272,7 @@ export function OrderApp() {
         name: restaurantName,
         theme: { color: "#c1622c" },
         handler: async (response) => {
-          const confirmRes = await fetch(`${PUBLIC_API_BASE_URL}/orders/confirm-payment`, {
+          const confirmRes = await fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/orders/confirm-payment`), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ order: payload, ...response }),
@@ -284,7 +297,7 @@ export function OrderApp() {
 
   async function submitDemoPrepay(): Promise<boolean> {
     try {
-      const res = await fetch(`${PUBLIC_API_BASE_URL}/orders/demo-prepay`, {
+      const res = await fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/orders/demo-prepay`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(cartPayload()),
@@ -339,6 +352,7 @@ export function OrderApp() {
           <BillView
             invoice={invoice}
             restaurantName={restaurantName}
+            restaurantSlug={restaurantSlug || undefined}
             razorpayEnabled={settings?.razorpay_enabled ?? false}
             onInvoiceUpdate={setInvoice}
             onDismiss={() => {

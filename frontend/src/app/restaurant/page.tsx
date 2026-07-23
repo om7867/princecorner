@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getVenue } from "@/data/venues";
 import { getVenueItems } from "@/lib/venue-items";
 import { getSiteSettings } from "@/lib/site-settings";
+import { PageUnavailable } from "@/components/ui/PageUnavailable";
 import { RestaurantClient } from "./RestaurantClient";
 
 const venue = getVenue("restaurant")!;
@@ -33,8 +34,11 @@ export const dynamic = "force-dynamic";
 export default async function RestaurantWorldPage() {
   const [items, settings] = await Promise.all([
     getVenueItems(venue.featuredIds),
-    getSiteSettings(),
+    getSiteSettings({ fresh: true }),
   ]);
 
+  if (settings.hidden_pages.includes("restaurant")) {
+    return <PageUnavailable siteName={settings.name} />;
+  }
   return <RestaurantClient items={items} siteName={settings.name} />;
 }

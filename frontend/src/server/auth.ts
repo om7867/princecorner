@@ -9,7 +9,12 @@ function jwtSecret(): string {
   return secret;
 }
 
-export type Session = { userId: string; role: SessionClaims["role"]; restaurantId: string };
+export type Session = {
+  userId: string;
+  role: SessionClaims["role"];
+  restaurantId: string | null;
+  organizationId: string | null;
+};
 
 /** Server-component/route-handler guard. Reads + verifies the session JWT locally. */
 export async function getSession(): Promise<Session | null> {
@@ -18,7 +23,12 @@ export async function getSession(): Promise<Session | null> {
   if (!token) return null;
   const claims = verifySessionToken(token, jwtSecret());
   if (!claims) return null;
-  return { userId: claims.sub, role: claims.role, restaurantId: claims.restaurant_id };
+  return {
+    userId: claims.sub,
+    role: claims.role,
+    restaurantId: claims.restaurant_id,
+    organizationId: claims.organization_id,
+  };
 }
 
 export async function getSessionToken(): Promise<string | null> {

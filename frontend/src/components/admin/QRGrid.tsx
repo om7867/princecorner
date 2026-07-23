@@ -14,6 +14,8 @@ export function QRGrid({ initialTables }: { initialTables: TableDTO[] }) {
   const [bulkCount, setBulkCount] = useState(3);
   const [busy, setBusy] = useState(false);
 
+  const restaurantSlug = settings?.restaurant_slug ?? "";
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -21,11 +23,14 @@ export function QRGrid({ initialTables }: { initialTables: TableDTO[] }) {
       const generated: Record<string, string> = {};
       for (const table of tables) {
         if (!table.is_active) continue;
-        generated[table.code] = await QRCode.toDataURL(`${base}/order?table=${table.code}`, {
-          width: 260,
-          margin: 1,
-          color: { dark: "#2e1e12", light: "#f5eee3" },
-        });
+        generated[table.code] = await QRCode.toDataURL(
+          `${base}/order?table=${table.code}&r=${restaurantSlug}`,
+          {
+            width: 260,
+            margin: 1,
+            color: { dark: "#2e1e12", light: "#f5eee3" },
+          }
+        );
       }
       if (!cancelled) {
         setCodes(generated);
@@ -35,7 +40,7 @@ export function QRGrid({ initialTables }: { initialTables: TableDTO[] }) {
     return () => {
       cancelled = true;
     };
-  }, [tables]);
+  }, [tables, restaurantSlug]);
 
   async function addTable() {
     const nextN =
@@ -143,7 +148,7 @@ export function QRGrid({ initialTables }: { initialTables: TableDTO[] }) {
             )}
             <p className="mt-2 text-[10px] text-espresso/50">{settings?.name ?? ""} · no app needed</p>
             <Link
-              href={`/order?table=${table.code}`}
+              href={`/order?table=${table.code}&r=${restaurantSlug}`}
               target="_blank"
               className="mt-3 text-xs font-semibold text-terracotta underline-offset-2 hover:underline print:hidden"
             >

@@ -35,10 +35,25 @@ def require_role(*roles: RoleEnum) -> Callable:
     return _guard
 
 
-# Convenience shorthand used across routers.
-require_owner_admin = require_role(RoleEnum.owner, RoleEnum.admin)
-require_menu_managers = require_role(RoleEnum.owner, RoleEnum.admin, RoleEnum.manager)
+# Convenience shorthand used across routers. `super_admin` is included in
+# every branch-level guard below — they operate any branch in their org via
+# the branch-switcher cookie (see get_current_restaurant_for_staff), so they
+# need to pass the same role checks a branch's own owner/admin would.
+require_owner_admin = require_role(RoleEnum.owner, RoleEnum.admin, RoleEnum.super_admin)
+require_menu_managers = require_role(RoleEnum.owner, RoleEnum.admin, RoleEnum.manager, RoleEnum.super_admin)
 require_order_staff = require_role(
-    RoleEnum.owner, RoleEnum.admin, RoleEnum.manager, RoleEnum.cashier, RoleEnum.kitchen, RoleEnum.waiter
+    RoleEnum.owner,
+    RoleEnum.admin,
+    RoleEnum.manager,
+    RoleEnum.cashier,
+    RoleEnum.kitchen,
+    RoleEnum.waiter,
+    RoleEnum.super_admin,
 )
-require_billing_staff = require_role(RoleEnum.owner, RoleEnum.admin, RoleEnum.manager, RoleEnum.cashier)
+require_billing_staff = require_role(
+    RoleEnum.owner, RoleEnum.admin, RoleEnum.manager, RoleEnum.cashier, RoleEnum.super_admin
+)
+
+# Phase 3: platform/organization level, above the branch-level roles.
+require_platform_owner = require_role(RoleEnum.platform_owner)
+require_super_admin = require_role(RoleEnum.super_admin)

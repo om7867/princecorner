@@ -58,13 +58,14 @@ export function SiteNavbar() {
 
   // each world's accent tints the active pill — you know which room you're
   // in before its 3D scene even finishes loading
+  const hiddenPages = live?.hidden_pages ?? [];
   const links = [
-    ...VENUES.map((v) => ({
+    ...VENUES.filter((v) => !hiddenPages.includes(v.slug)).map((v) => ({
       href: `/${v.slug}`,
       label: v.name.replace("The ", ""),
       accent: v.accent,
     })),
-    { href: "/menu", label: "Menu", accent: "#e7a73a" },
+    ...(hiddenPages.includes("menu") ? [] : [{ href: "/menu", label: "Menu", accent: "#e7a73a" }]),
   ];
 
   return (

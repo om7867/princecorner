@@ -63,6 +63,7 @@ class MenuItemRead(BaseModel):
     is_available: bool
     is_active: bool
     sort_order: int
+    source_global_item_id: str | None = None
     variants: list[VariantRead] = []
     addons: list[AddonRead] = []
 

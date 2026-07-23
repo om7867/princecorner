@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getVenue } from "@/data/venues";
 import { getVenueItems } from "@/lib/venue-items";
 import { getSiteSettings } from "@/lib/site-settings";
+import { PageUnavailable } from "@/components/ui/PageUnavailable";
 import { CafeClient } from "./CafeClient";
 
 const venue = getVenue("cafe")!;
@@ -33,8 +34,11 @@ export const dynamic = "force-dynamic";
 export default async function CafeWorldPage() {
   const [items, settings] = await Promise.all([
     getVenueItems(venue.featuredIds),
-    getSiteSettings(),
+    getSiteSettings({ fresh: true }),
   ]);
 
+  if (settings.hidden_pages.includes("cafe")) {
+    return <PageUnavailable siteName={settings.name} />;
+  }
   return <CafeClient items={items} siteName={settings.name} />;
 }

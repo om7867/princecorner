@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { API_BASE_URL } from "@/lib/env";
 import { getSiteSettings } from "@/lib/site-settings";
 import type { MenuItemDTO } from "@/lib/types";
+import { PageUnavailable } from "@/components/ui/PageUnavailable";
 import { MenuHub } from "./MenuHub";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,7 +26,11 @@ async function getMenuItems(): Promise<MenuItemDTO[]> {
 }
 
 export default async function MenuHubPage() {
-  const [items, settings] = await Promise.all([getMenuItems(), getSiteSettings()]);
+  const [items, settings] = await Promise.all([getMenuItems(), getSiteSettings({ fresh: true })]);
+
+  if (settings.hidden_pages.includes("menu")) {
+    return <PageUnavailable siteName={settings.name} />;
+  }
 
   return (
     <>

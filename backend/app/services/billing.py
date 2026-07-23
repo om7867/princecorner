@@ -241,7 +241,7 @@ async def create_standalone_razorpay_order(amount: Decimal) -> tuple[str, int, s
 async def prepare_order_payment(db: AsyncSession, restaurant_id: str, order_payload: OrderCreate) -> tuple[str, int, str]:
     """Pay-online-first flow, step 1: price the cart and open a Razorpay
     order for it, before the kitchen ever sees it."""
-    await orders_service.get_active_table(db, order_payload.table.upper())
+    await orders_service.get_active_table(db, restaurant_id, order_payload.table.upper())
     total = await _price_cart_with_tax(db, restaurant_id, order_payload)
     return await create_standalone_razorpay_order(total)
 
@@ -292,7 +292,7 @@ async def confirm_order_payment(db: AsyncSession, restaurant_id: str, payload: O
     rp_order = client.order.fetch(payload.razorpay_order_id)
     charged_paise = rp_order["amount"]
 
-    table = await orders_service.get_active_table(db, payload.order.table.upper())
+    table = await orders_service.get_active_table(db, restaurant_id, payload.order.table.upper())
     total = await _price_cart_with_tax(db, restaurant_id, payload.order)
     expected_paise = int((total * 100).to_integral_value())
     if abs(expected_paise - charged_paise) > 1:
@@ -320,7 +320,7 @@ async def demo_prepay(db: AsyncSession, restaurant_id: str, order_payload: Order
     if settings.razorpay_key_id and settings.razorpay_key_secret:
         raise HTTPException(status.HTTP_409_CONFLICT, "Demo payment is disabled once online payment is configured")
 
-    table = await orders_service.get_active_table(db, order_payload.table.upper())
+    table = await orders_service.get_active_table(db, restaurant_id, order_payload.table.upper())
     order = await orders_service.create_order(db, restaurant_id, order_payload)
     payment = Payment(method=PaymentMethodEnum.card, amount=Decimal("0"), status=PaymentStatusEnum.succeeded)
     return await _finalize_prepaid_order(db, restaurant_id, order, table.id, payment)

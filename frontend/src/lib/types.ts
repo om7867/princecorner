@@ -95,6 +95,7 @@ export type HoursEntry = { days: string; time: string };
 
 export type SiteSettingsDTO = {
   name: string;
+  restaurant_slug: string;
   tagline: string | null;
   description: string | null;
   logo_url: string | null;
@@ -118,9 +119,19 @@ export type SiteSettingsDTO = {
   tax_rate: string;
   loyalty_points_per_currency: string;
   loyalty_redeem_rate: string;
+  hidden_pages: string[];
   razorpay_enabled: boolean;
   razorpay_key_id: string | null;
 };
+
+/** The public-site destinations an owner can toggle live/unlive from Admin > Pages. */
+export const TOGGLEABLE_PAGES = [
+  { slug: "restaurant", label: "Restaurant", href: "/restaurant" },
+  { slug: "cafe", label: "Café", href: "/cafe" },
+  { slug: "bar", label: "Bar", href: "/bar" },
+  { slug: "bakery", label: "Bakery", href: "/bakery" },
+  { slug: "menu", label: "Menu", href: "/menu" },
+] as const;
 
 export function formatMoney(value: string | number): string {
   return `$${Number(value).toFixed(2)}`;
@@ -213,6 +224,22 @@ export type RecipeLineDTO = {
 };
 
 // ── Analytics ────────────────────────────────────────────────────────────
+
+// ── Platform (platform_owner only) ──────────────────────────────────────
+
+export type OrganizationStatus = "trial" | "active" | "suspended";
+export type OrganizationPlan = "trial" | "starter" | "pro" | "enterprise";
+
+export type OrganizationDTO = {
+  id: string;
+  name: string;
+  slug: string;
+  status: OrganizationStatus;
+  plan: OrganizationPlan;
+  access_ends_at: string | null;
+  created_at: string;
+  branch_count: number;
+};
 
 export type AnalyticsSummaryDTO = {
   today_revenue: string;

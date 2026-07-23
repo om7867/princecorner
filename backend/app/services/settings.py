@@ -18,6 +18,7 @@ async def get_settings_read(db: AsyncSession, restaurant: Restaurant, settings: 
     razorpay_enabled = bool(app_settings.razorpay_key_id and app_settings.razorpay_key_secret)
     return SiteSettingsRead(
         name=restaurant.name,
+        restaurant_slug=restaurant.slug,
         razorpay_enabled=razorpay_enabled,
         razorpay_key_id=app_settings.razorpay_key_id if razorpay_enabled else None,
         **fields,

@@ -55,6 +55,10 @@ class SiteSettings(Base):
     loyalty_points_per_currency: Mapped[Decimal] = mapped_column(Numeric(6, 2), default=1)
     loyalty_redeem_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), default=0.01)
 
+    # Page slugs currently toggled "unlive" from Admin > Pages — hidden from
+    # the public nav and shown a placeholder instead of real content.
+    hidden_pages: Mapped[list[str]] = mapped_column(JSON, default=list)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

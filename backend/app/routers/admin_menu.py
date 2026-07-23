@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import require_menu_managers
-from app.core.tenant import get_current_restaurant
+from app.core.tenant import get_current_restaurant_for_staff
 from app.db.session import get_db
 from app.models.restaurant import Restaurant
 from app.schemas.menu import (
@@ -23,7 +23,7 @@ router = APIRouter(prefix="/admin", tags=["admin-menu"], dependencies=[Depends(r
 
 @router.get("/menu", response_model=list[MenuItemRead])
 async def admin_list_menu(
-    db: AsyncSession = Depends(get_db), restaurant: Restaurant = Depends(get_current_restaurant)
+    db: AsyncSession = Depends(get_db), restaurant: Restaurant = Depends(get_current_restaurant_for_staff)
 ) -> list[MenuItemRead]:
     items = await menu_service.list_menu_items(db, restaurant.id, available_only=False)
     return [MenuItemRead.model_validate(i) for i in items]
@@ -33,7 +33,7 @@ async def admin_list_menu(
 async def create_category(
     payload: CategoryWrite,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> CategoryRead:
     category = await menu_service.create_category(db, restaurant.id, payload)
     return CategoryRead.model_validate(category)
@@ -43,7 +43,7 @@ async def create_category(
 async def create_item(
     payload: MenuItemCreate,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> MenuItemRead:
     item = await menu_service.create_menu_item(db, restaurant.id, payload)
     return MenuItemRead.model_validate(item)
@@ -54,7 +54,7 @@ async def patch_item(
     item_id: str,
     payload: MenuItemUpdate,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> MenuItemRead:
     item = await menu_service.update_menu_item(db, restaurant.id, item_id, payload)
     return MenuItemRead.model_validate(item)
@@ -62,7 +62,7 @@ async def patch_item(
 
 @router.delete("/menu/items/{item_id}")
 async def remove_item(
-    item_id: str, db: AsyncSession = Depends(get_db), restaurant: Restaurant = Depends(get_current_restaurant)
+    item_id: str, db: AsyncSession = Depends(get_db), restaurant: Restaurant = Depends(get_current_restaurant_for_staff)
 ) -> dict:
     await menu_service.delete_menu_item(db, restaurant.id, item_id)
     return {"ok": True}
@@ -73,7 +73,7 @@ async def create_variant(
     item_id: str,
     payload: VariantWrite,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> VariantRead:
     variant = await menu_service.add_variant(db, restaurant.id, item_id, payload)
     return VariantRead.model_validate(variant)
@@ -85,7 +85,7 @@ async def patch_variant(
     variant_id: str,
     payload: VariantWrite,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> VariantRead:
     variant = await menu_service.update_variant(db, restaurant.id, item_id, variant_id, payload)
     return VariantRead.model_validate(variant)
@@ -96,7 +96,7 @@ async def remove_variant(
     item_id: str,
     variant_id: str,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> dict:
     await menu_service.delete_variant(db, restaurant.id, item_id, variant_id)
     return {"ok": True}
@@ -107,7 +107,7 @@ async def create_addon(
     item_id: str,
     payload: AddonWrite,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> AddonRead:
     addon = await menu_service.add_addon(db, restaurant.id, item_id, payload)
     return AddonRead.model_validate(addon)
@@ -119,7 +119,7 @@ async def patch_addon(
     addon_id: str,
     payload: AddonWrite,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> AddonRead:
     addon = await menu_service.update_addon(db, restaurant.id, item_id, addon_id, payload)
     return AddonRead.model_validate(addon)
@@ -130,7 +130,7 @@ async def remove_addon(
     item_id: str,
     addon_id: str,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> dict:
     await menu_service.delete_addon(db, restaurant.id, item_id, addon_id)
     return {"ok": True}

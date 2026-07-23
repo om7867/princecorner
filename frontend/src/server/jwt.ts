@@ -2,8 +2,17 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 export type SessionClaims = {
   sub: string;
-  role: "owner" | "admin" | "manager" | "cashier" | "kitchen" | "waiter";
-  restaurant_id: string;
+  role:
+    | "owner"
+    | "admin"
+    | "manager"
+    | "cashier"
+    | "kitchen"
+    | "waiter"
+    | "platform_owner"
+    | "super_admin";
+  restaurant_id: string | null;
+  organization_id: string | null;
   exp: number;
 };
 

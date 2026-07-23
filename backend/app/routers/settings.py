@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import require_owner_admin
-from app.core.tenant import get_current_restaurant
+from app.core.tenant import get_current_restaurant_for_staff, get_current_restaurant_public
 from app.db.session import get_db
 from app.models.restaurant import Restaurant
 from app.models.site_settings import SiteSettings
@@ -20,7 +20,7 @@ async def _get_settings_row(db: AsyncSession, restaurant: Restaurant) -> SiteSet
 
 @router.get("/settings", response_model=SiteSettingsRead)
 async def read_settings(
-    db: AsyncSession = Depends(get_db), restaurant: Restaurant = Depends(get_current_restaurant)
+    db: AsyncSession = Depends(get_db), restaurant: Restaurant = Depends(get_current_restaurant_public)
 ) -> SiteSettingsRead:
     settings = await _get_settings_row(db, restaurant)
     return await get_settings_read(db, restaurant, settings)
@@ -30,7 +30,7 @@ async def read_settings(
 async def patch_settings(
     payload: SiteSettingsUpdate,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
     _user=Depends(require_owner_admin),
 ) -> SiteSettingsRead:
     settings = await _get_settings_row(db, restaurant)

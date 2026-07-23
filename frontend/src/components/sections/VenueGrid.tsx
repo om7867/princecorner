@@ -7,8 +7,9 @@ import { VENUES } from "@/data/venues";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-export function VenueGrid() {
+export function VenueGrid({ hiddenPages = [] }: { hiddenPages?: string[] }) {
   const containerRef = useRef<HTMLElement>(null);
+  const venues = VENUES.filter((v) => !hiddenPages.includes(v.slug));
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -63,7 +64,7 @@ export function VenueGrid() {
       {/* MOBILE: Horizontal Swipe Carousel */}
       <div className="lg:hidden w-full relative">
         <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 px-6 pb-12 no-scrollbar">
-          {VENUES.map((venue, index) => (
+          {venues.map((venue, index) => (
             <div 
               key={venue.slug} 
               className="snap-center shrink-0 relative h-[60vh] min-h-[450px] w-[85vw] max-w-sm shadow-2xl rounded-3xl overflow-hidden bg-espresso active:scale-[0.98] transition-transform duration-300"

@@ -31,11 +31,20 @@ async def create_coupon(db: AsyncSession, restaurant_id: str, payload: CouponCre
     return coupon
 
 
+_BRANCH_OVERRIDABLE_COUPON_FIELDS = {"is_active"}
+
+
 async def update_coupon(db: AsyncSession, restaurant_id: str, coupon_id: str, payload: CouponUpdate) -> Coupon:
     coupon = await db.get(Coupon, coupon_id)
     if not coupon or coupon.restaurant_id != restaurant_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Coupon not found")
-    for field, value in payload.model_dump(exclude_unset=True).items():
+    updates = payload.model_dump(exclude_unset=True)
+    if coupon.source_global_coupon_id is not None and not set(updates).issubset(_BRANCH_OVERRIDABLE_COUPON_FIELDS):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "This coupon is managed by chain HQ — only availability can be changed here",
+        )
+    for field, value in updates.items():
         setattr(coupon, field, value)
     await db.commit()
     await db.refresh(coupon)

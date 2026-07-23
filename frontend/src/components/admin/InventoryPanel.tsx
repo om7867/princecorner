@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { IngredientDTO, SupplierDTO } from "@/lib/types";
+import { TransferRequestsSection } from "@/components/admin/TransferRequestsSection";
 
 const inputClasses =
   "rounded-lg border border-linen/15 bg-espresso/40 px-3 py-2 text-sm text-linen placeholder:text-linen/35 focus:border-saffron focus:outline-none";
@@ -151,6 +152,8 @@ export function InventoryPanel() {
           </div>
         ))}
       </div>
+
+      <TransferRequestsSection />
     </main>
   );
 }

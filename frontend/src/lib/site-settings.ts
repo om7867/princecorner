@@ -3,6 +3,7 @@ import type { SiteSettingsDTO } from "@/lib/types";
 
 const FALLBACK: SiteSettingsDTO = {
   name: "Your Restaurant Name",
+  restaurant_slug: "",
   tagline: null,
   description: null,
   logo_url: null,
@@ -26,14 +27,21 @@ const FALLBACK: SiteSettingsDTO = {
   tax_rate: "0",
   loyalty_points_per_currency: "1",
   loyalty_redeem_rate: "0.01",
+  hidden_pages: [],
   razorpay_enabled: false,
   razorpay_key_id: null,
 };
 
-/** Server-side fetch of the restaurant's branding/CMS settings. */
-export async function getSiteSettings(): Promise<SiteSettingsDTO> {
+/** Server-side fetch of the restaurant's branding/CMS settings.
+ * Pass `fresh: true` to bypass the 30s cache — used by pages that gate
+ * their own visibility (Admin > Pages live/unlive) so toggling one off
+ * takes effect immediately instead of up to 30s later. */
+export async function getSiteSettings({ fresh = false }: { fresh?: boolean } = {}): Promise<SiteSettingsDTO> {
   try {
-    const res = await fetch(`${API_BASE_URL}/settings`, { next: { revalidate: 30 } });
+    const res = await fetch(
+      `${API_BASE_URL}/settings`,
+      fresh ? { cache: "no-store" } : { next: { revalidate: 30 } }
+    );
     if (!res.ok) return FALLBACK;
     return (await res.json()) as SiteSettingsDTO;
   } catch {

@@ -24,6 +24,16 @@ class Settings(BaseSettings):
     # seed of an empty database (seeding is a no-op once the restaurant exists).
     seed_owner_email: str = "owner@example.com"
     seed_owner_password: str = "ChangeMe123!"  # nosec - dev-only default
+    seed_platform_owner_email: str = "platform@example.com"
+    seed_platform_owner_password: str = "ChangeMe123!"  # nosec - dev-only default
+
+    # A separate demo organization/branch + super_admin/branch-admin logins,
+    # used only by the quick-login cards on /admin/login — kept isolated
+    # from real restaurant data so demoing never touches production rows.
+    seed_demo_super_admin_email: str = "demo.superadmin@example.com"
+    seed_demo_super_admin_password: str = "DemoPass123!"  # nosec - dev-only default
+    seed_demo_branch_admin_email: str = "demo.branchadmin@example.com"
+    seed_demo_branch_admin_password: str = "DemoPass123!"  # nosec - dev-only default
 
     @property
     def cors_origin_list(self) -> list[str]:

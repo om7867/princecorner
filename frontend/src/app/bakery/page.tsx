@@ -14,6 +14,7 @@ import {
   GapCaption,
 } from "@/components/worlds/shared";
 import { VenueGalleryBand, VenueFAQ, VenueCTABanner } from "@/components/venues/shared";
+import { PageUnavailable } from "@/components/ui/PageUnavailable";
 
 const venue = getVenue("bakery")!;
 
@@ -46,8 +47,12 @@ export const dynamic = "force-dynamic";
 export default async function BakeryWorldPage() {
   const [items, settings] = await Promise.all([
     getVenueItems(venue.featuredIds),
-    getSiteSettings(),
+    getSiteSettings({ fresh: true }),
   ]);
+
+  if (settings.hidden_pages.includes("bakery")) {
+    return <PageUnavailable siteName={settings.name} />;
+  }
 
   return (
     <>

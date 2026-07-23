@@ -7,13 +7,18 @@ from app.routers import (
     analytics,
     auth,
     billing,
+    global_coupons,
+    global_menu,
     inventory,
     menu,
     orders,
+    organization,
+    platform,
     promotions,
     realtime,
     reservations,
     settings,
+    staff,
     tables,
     ws,
 )
@@ -48,6 +53,12 @@ app.include_router(billing.refund_router)
 app.include_router(promotions.router)
 app.include_router(inventory.router)
 app.include_router(analytics.router)
+app.include_router(platform.router)
+app.include_router(organization.router)
+app.include_router(staff.router)
+app.include_router(staff.org_router)
+app.include_router(global_menu.router)
+app.include_router(global_coupons.router)
 
 
 @app.get("/health")

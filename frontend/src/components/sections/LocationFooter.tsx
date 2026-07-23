@@ -98,7 +98,7 @@ export function LocationFooter({ settings }: { settings: SiteSettingsDTO }) {
               The Rooms
             </h2>
             <ul className="mt-4 space-y-2.5" role="list">
-              {VENUES.map((venue) => (
+              {VENUES.filter((venue) => !settings.hidden_pages.includes(venue.slug)).map((venue) => (
                 <li key={venue.slug}>
                   <Link
                     href={`/${venue.slug}`}
@@ -108,14 +108,16 @@ export function LocationFooter({ settings }: { settings: SiteSettingsDTO }) {
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link
-                  href="/#menu"
-                  className="text-sm text-linen/70 transition-colors hover:text-saffron"
-                >
-                  The Menu
-                </Link>
-              </li>
+              {!settings.hidden_pages.includes("menu") && (
+                <li>
+                  <Link
+                    href="/#menu"
+                    className="text-sm text-linen/70 transition-colors hover:text-saffron"
+                  >
+                    The Menu
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>

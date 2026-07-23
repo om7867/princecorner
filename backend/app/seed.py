@@ -16,6 +16,7 @@ from alembic import command as alembic_command
 from alembic.config import Config as AlembicConfig
 from sqlalchemy import select
 from sqlalchemy.engine import make_url
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.security import hash_password
@@ -23,16 +24,29 @@ from app.core.tenant import DEFAULT_RESTAURANT_SLUG
 from app.db.session import AsyncSessionLocal
 from app.models.inventory import Ingredient, MenuItemIngredient, Supplier
 from app.models.menu import MenuCategory, MenuItem
+from app.models.organization import Organization, OrganizationStatusEnum
 from app.models.promotions import Coupon, CouponTypeEnum
 from app.models.restaurant import Restaurant
 from app.models.site_settings import SiteSettings
 from app.models.table import RestaurantTable
 from app.models.user import RoleEnum, User
+from app.schemas.organization import BranchCreate
+from app.seed_demo_data import engagement, inventory_staff, menu_promotions, platform_org
+from app.services.organization import create_branch
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 OWNER_EMAIL = get_settings().seed_owner_email
 OWNER_PASSWORD = get_settings().seed_owner_password
+
+PLATFORM_OWNER_EMAIL = get_settings().seed_platform_owner_email
+PLATFORM_OWNER_PASSWORD = get_settings().seed_platform_owner_password
+
+DEMO_ORG_SLUG = "demo-bistro-group"
+DEMO_SUPER_ADMIN_EMAIL = get_settings().seed_demo_super_admin_email
+DEMO_SUPER_ADMIN_PASSWORD = get_settings().seed_demo_super_admin_password
+DEMO_BRANCH_ADMIN_EMAIL = get_settings().seed_demo_branch_admin_email
+DEMO_BRANCH_ADMIN_PASSWORD = get_settings().seed_demo_branch_admin_password
 
 
 def ensure_database_exists() -> None:
@@ -206,8 +220,114 @@ MENU_ITEMS = [
 ]
 
 
+async def seed_platform_owner(db: AsyncSession) -> None:
+    """Independently idempotent — creates the one `platform_owner` User row
+    (organization_id=None, restaurant_id=None) if it doesn't already exist by
+    email. Runs regardless of whether the restaurant/owner seed below has
+    already happened, since it seeds a different, unrelated piece of data."""
+    existing = await db.execute(select(User).where(User.email == PLATFORM_OWNER_EMAIL))
+    if existing.scalar_one_or_none():
+        print("Platform owner already seeded — nothing to do.")
+        return
+
+    db.add(
+        User(
+            organization_id=None,
+            restaurant_id=None,
+            name="Platform Owner",
+            email=PLATFORM_OWNER_EMAIL,
+            password_hash=hash_password(PLATFORM_OWNER_PASSWORD),
+            role=RoleEnum.platform_owner,
+        )
+    )
+    await db.commit()
+
+    print(f"Seeded: 1 platform_owner user ({PLATFORM_OWNER_EMAIL} / {PLATFORM_OWNER_PASSWORD})")
+    print("Dev-only credentials — change immediately before any real deployment.")
+
+
+async def seed_demo_organization(db: AsyncSession) -> None:
+    """Independently idempotent — seeds a small, self-contained demo chain
+    with a super_admin and a branch-admin login. Used by the quick-login
+    cards on /admin/login and as the target org for every seed_demo_data/*
+    module below, kept fully separate from any real restaurant's data so
+    demoing never touches production rows.
+
+    The initial org/branch/user creation below is itself idempotent (skipped
+    if the org already exists), but the richer demo-data modules always run
+    afterward — they're independently idempotent per-module, so this
+    function stays safe to call on every `python -m app.seed` regardless of
+    whether the org was just created or has existed since a prior run."""
+    existing = await db.execute(select(Organization).where(Organization.slug == DEMO_ORG_SLUG))
+    if not existing.scalar_one_or_none():
+        org = Organization(name="Demo Bistro Group", slug=DEMO_ORG_SLUG, status=OrganizationStatusEnum.active)
+        db.add(org)
+        await db.flush()
+
+        downtown = await create_branch(db, org.id, BranchCreate(name="Demo Downtown", slug="demo-downtown"))
+        await create_branch(db, org.id, BranchCreate(name="Demo Uptown", slug="demo-uptown"))
+
+        category = MenuCategory(restaurant_id=downtown.id, name="Mains", slug="mains", sort_order=0)
+        db.add(category)
+        await db.flush()
+        db.add(
+            MenuItem(
+                restaurant_id=downtown.id,
+                category_id=category.id,
+                name="Demo Butter Chicken",
+                description="A sample dish so the demo menu isn't empty.",
+                base_price=Decimal("12.00"),
+                sort_order=0,
+            )
+        )
+        for i in range(1, 5):
+            db.add(RestaurantTable(restaurant_id=downtown.id, code=f"T{i}"))
+
+        db.add(
+            User(
+                organization_id=org.id,
+                restaurant_id=None,
+                name="Demo Super Admin",
+                email=DEMO_SUPER_ADMIN_EMAIL,
+                password_hash=hash_password(DEMO_SUPER_ADMIN_PASSWORD),
+                role=RoleEnum.super_admin,
+            )
+        )
+        db.add(
+            User(
+                organization_id=org.id,
+                restaurant_id=downtown.id,
+                name="Demo Branch Admin",
+                email=DEMO_BRANCH_ADMIN_EMAIL,
+                password_hash=hash_password(DEMO_BRANCH_ADMIN_PASSWORD),
+                role=RoleEnum.admin,
+            )
+        )
+        await db.commit()
+
+        print(
+            "Seeded: demo organization 'Demo Bistro Group' with 2 branches, "
+            f"1 super_admin ({DEMO_SUPER_ADMIN_EMAIL} / {DEMO_SUPER_ADMIN_PASSWORD}), "
+            f"1 branch admin ({DEMO_BRANCH_ADMIN_EMAIL} / {DEMO_BRANCH_ADMIN_PASSWORD})"
+        )
+        print("Dev-only credentials — change immediately before any real deployment.")
+    else:
+        print("Demo organization already seeded — checking richer demo data next.")
+
+    # Richer demo data — menu/coupons first (orders + inventory recipes
+    # reference real menu items), then engagement + inventory/staff, then
+    # platform-tier extras (additional orgs, 3rd branch, tables, branding).
+    await menu_promotions.seed(db)
+    await inventory_staff.seed(db)
+    await engagement.seed(db)
+    await platform_org.seed(db)
+
+
 async def seed() -> None:
     async with AsyncSessionLocal() as db:
+        await seed_platform_owner(db)
+        await seed_demo_organization(db)
+
         existing = await db.execute(select(Restaurant).where(Restaurant.slug == DEFAULT_RESTAURANT_SLUG))
         if existing.scalar_one_or_none():
             print("Already seeded — nothing to do.")

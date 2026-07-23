@@ -8,6 +8,11 @@ from app.db.base import Base, new_uuid
 
 
 class RoleEnum(str, enum.Enum):
+    # Platform level — runs the SaaS itself, belongs to no organization/restaurant.
+    platform_owner = "platform_owner"
+    # Organization level — owns a chain, belongs to an organization but no single restaurant.
+    super_admin = "super_admin"
+    # Branch level — scoped to exactly one restaurant (branch), as before Phase 3.
     owner = "owner"
     admin = "admin"
     manager = "manager"
@@ -20,8 +25,13 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
-    restaurant_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("restaurants.id", ondelete="CASCADE"), index=True
+    # Nullable: platform_owner has neither; super_admin has an organization but
+    # no single restaurant_id (they act across every branch in their org).
+    organization_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    restaurant_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("restaurants.id", ondelete="CASCADE"), nullable=True, index=True
     )
     name: Mapped[str] = mapped_column(String(200))
     email: Mapped[str] = mapped_column(String(200), unique=True, index=True)

@@ -61,9 +61,18 @@ async def get_menu_item_or_404(db: AsyncSession, restaurant_id: str, item_id: st
     return item
 
 
+_BRANCH_OVERRIDABLE_FIELDS = {"base_price", "is_available", "is_active", "sort_order"}
+
+
 async def update_menu_item(db: AsyncSession, restaurant_id: str, item_id: str, payload: MenuItemUpdate) -> MenuItem:
     item = await get_menu_item_or_404(db, restaurant_id, item_id)
-    for field, value in payload.model_dump(exclude_unset=True).items():
+    updates = payload.model_dump(exclude_unset=True)
+    if item.source_global_item_id is not None and not set(updates).issubset(_BRANCH_OVERRIDABLE_FIELDS):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "This item is managed by chain HQ — only price and availability can be changed here",
+        )
+    for field, value in updates.items():
         setattr(item, field, value)
     await db.commit()
     await db.refresh(item, attribute_names=["variants", "addons"])

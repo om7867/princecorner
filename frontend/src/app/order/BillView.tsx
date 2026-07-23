@@ -10,12 +10,14 @@ import { DemoCardModal } from "@/components/order/DemoCardModal";
 export function BillView({
   invoice,
   restaurantName,
+  restaurantSlug,
   razorpayEnabled,
   onInvoiceUpdate,
   onDismiss,
 }: {
   invoice: InvoiceDTO;
   restaurantName: string;
+  restaurantSlug?: string;
   razorpayEnabled: boolean;
   onInvoiceUpdate: (invoice: InvoiceDTO) => void;
   onDismiss: () => void;
@@ -26,11 +28,17 @@ export function BillView({
 
   const remaining = Number(invoice.total) - Number(invoice.amount_paid);
 
+  function withRestaurant(url: string): string {
+    return restaurantSlug
+      ? `${url}${url.includes("?") ? "&" : "?"}restaurant=${encodeURIComponent(restaurantSlug)}`
+      : url;
+  }
+
   async function payOnline() {
     setPaying(true);
     setError(null);
     try {
-      const orderRes = await fetch(`${PUBLIC_API_BASE_URL}/invoices/${invoice.id}/razorpay-order`, {
+      const orderRes = await fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/invoices/${invoice.id}/razorpay-order`), {
         method: "POST",
       });
       if (!orderRes.ok) {
@@ -53,7 +61,7 @@ export function BillView({
         name: restaurantName,
         theme: { color: "#e7a73a" },
         handler: async (response) => {
-          const verifyRes = await fetch(`${PUBLIC_API_BASE_URL}/invoices/${invoice.id}/razorpay-verify`, {
+          const verifyRes = await fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/invoices/${invoice.id}/razorpay-verify`), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response),
@@ -73,7 +81,7 @@ export function BillView({
 
   async function submitDemoPayment(): Promise<boolean> {
     try {
-      const res = await fetch(`${PUBLIC_API_BASE_URL}/invoices/${invoice.id}/demo-pay`, { method: "POST" });
+      const res = await fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/invoices/${invoice.id}/demo-pay`), { method: "POST" });
       if (!res.ok) return false;
       onInvoiceUpdate(await res.json());
       return true;

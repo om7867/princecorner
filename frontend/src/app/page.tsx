@@ -64,7 +64,7 @@ export default async function Home() {
             imageAlt="Restaurant Interior"
           />
 
-          <VenueGrid />
+          <VenueGrid hiddenPages={settings.hidden_pages} />
           <GalleryStrip />
           
           <EditorialSection 

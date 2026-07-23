@@ -33,6 +33,13 @@ class MenuItem(Base):
     category_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("menu_categories.id", ondelete="RESTRICT"), index=True
     )
+    # Set when this row was pushed from a Super Admin's Global Menu template.
+    # The branch-level update endpoint uses this to reject edits to
+    # protected fields (name/description/category) while still allowing
+    # local price/availability overrides ("Branch Menu Override").
+    source_global_item_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("global_menu_items.id", ondelete="SET NULL"), nullable=True, index=True
+    )
 
     name: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(String(2000), default="")
@@ -93,3 +100,28 @@ class MenuItemAddon(Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
     menu_item: Mapped[MenuItem] = relationship(back_populates="addons")
+
+
+class GlobalMenuItem(Base):
+    """A Super Admin's org-wide master menu item. Saving one pushes/updates a
+    real `MenuItem` row (tagged via `source_global_item_id`) in every active
+    branch of the organization — see `services/global_menu.py`. This table
+    is the template; `MenuItem` rows are the per-branch working copies."""
+
+    __tablename__ = "global_menu_items"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    organization_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("organizations.id", ondelete="CASCADE"), index=True
+    )
+    name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(String(2000), default="")
+    base_price: Mapped[Decimal] = mapped_column(Numeric(10, 2))
+    category_name: Mapped[str] = mapped_column(String(100))
+    dietary_tags: Mapped[list] = mapped_column(JSON, default=list)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )

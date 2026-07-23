@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.tenant import get_current_restaurant
+from app.core.tenant import get_current_restaurant_public
 from app.db.session import get_db
 from app.models.restaurant import Restaurant
 from app.models.table import RestaurantTable
@@ -18,7 +18,7 @@ async def orders_socket(
     ticket: str | None = None,
     table: str | None = None,
     db: AsyncSession = Depends(get_db),
-    restaurant: Restaurant = Depends(get_current_restaurant),
+    restaurant: Restaurant = Depends(get_current_restaurant_public),
 ) -> None:
     if table:
         code = table.upper()

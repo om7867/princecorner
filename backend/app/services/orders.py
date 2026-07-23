@@ -21,9 +21,16 @@ def _display_code() -> str:
     return f"ORD-{int(time_module.time() * 1000):x}".upper() + f"{random.randint(10, 99)}"
 
 
-async def get_active_table(db: AsyncSession, code: str) -> RestaurantTable:
+async def get_active_table(db: AsyncSession, restaurant_id: str, code: str) -> RestaurantTable:
+    # Scoped by restaurant_id, not just code: different branches routinely
+    # reuse the same table codes ("T1", "T2", ...), which would otherwise
+    # collide across tenants and raise MultipleResultsFound.
     result = await db.execute(
-        select(RestaurantTable).where(RestaurantTable.code == code, RestaurantTable.is_active.is_(True))
+        select(RestaurantTable).where(
+            RestaurantTable.restaurant_id == restaurant_id,
+            RestaurantTable.code == code,
+            RestaurantTable.is_active.is_(True),
+        )
     )
     table = result.scalar_one_or_none()
     if not table:
@@ -70,7 +77,7 @@ async def compute_order_total(db: AsyncSession, restaurant_id: str, payload: Ord
 
 
 async def create_order(db: AsyncSession, restaurant_id: str, payload: OrderCreate) -> OrderRead:
-    table = await get_active_table(db, payload.table.upper())
+    table = await get_active_table(db, restaurant_id, payload.table.upper())
     if not payload.lines:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Cart is empty")
 
@@ -138,7 +145,7 @@ async def create_order(db: AsyncSession, restaurant_id: str, payload: OrderCreat
 
 
 async def list_orders_for_table(db: AsyncSession, restaurant_id: str, table_code: str) -> list[OrderRead]:
-    table = await get_active_table(db, table_code.upper())
+    table = await get_active_table(db, restaurant_id, table_code.upper())
     result = await db.execute(
         select(Order)
         .options(selectinload(Order.items).selectinload(OrderItem.addons))

@@ -10,6 +10,7 @@ class HoursEntry(BaseModel):
 
 class SiteSettingsRead(BaseModel):
     name: str  # from Restaurant.name, surfaced here since it's the primary "rebrand" field
+    restaurant_slug: str  # from Restaurant.slug — lets guest ordering pin requests to this branch
     tagline: str | None = None
     description: str | None = None
     logo_url: str | None = None
@@ -33,6 +34,7 @@ class SiteSettingsRead(BaseModel):
     tax_rate: Decimal = Decimal("0")
     loyalty_points_per_currency: Decimal = Decimal("1")
     loyalty_redeem_rate: Decimal = Decimal("0.01")
+    hidden_pages: list[str] = []
     razorpay_enabled: bool = False  # computed from whether RAZORPAY_KEY_ID/SECRET are configured, not stored
     razorpay_key_id: str | None = None  # publishable key id — safe to expose, needed by Razorpay Checkout.js
 
@@ -64,3 +66,4 @@ class SiteSettingsUpdate(BaseModel):
     tax_rate: Decimal | None = None
     loyalty_points_per_currency: Decimal | None = None
     loyalty_redeem_rate: Decimal | None = None
+    hidden_pages: list[str] | None = None
