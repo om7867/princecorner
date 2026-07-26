@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { SiteNavbar } from "./SiteNavbar";
 import { FloatingContact } from "./FloatingContact";
+import { PrinceCornerBadge } from "./PrinceCornerBadge";
 
 /**
  * Marketing-site chrome (navbar, WhatsApp/call buttons). Hidden on the
@@ -19,6 +20,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     <>
       <SiteNavbar />
       {children}
+      <PrinceCornerBadge />
       <FloatingContact />
     </>
   );

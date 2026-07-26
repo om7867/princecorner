@@ -17,6 +17,12 @@
   --color-linen-soft: #faf6ee;
   --color-espresso-soft: #3d2a1a;
 
+  /* Prince Corner — the red/white street-food stall world, kept as its own
+     accent pair so it never bleeds into the main saffron/terracotta palette. */
+  --color-prince-red: #c8102e;
+  --color-prince-red-deep: #4a0812;
+  --color-prince-cream: #fff6f1;
+
   /* motion */
   --ease-cubic: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -33,6 +39,10 @@
   --color-sage: var(--color-sage);
   --color-saffron: var(--color-saffron);
   --color-charcoal: var(--color-charcoal);
+
+  --color-prince-red: var(--color-prince-red);
+  --color-prince-red-deep: var(--color-prince-red-deep);
+  --color-prince-cream: var(--color-prince-cream);
 
   --font-display: var(--font-display);
   --font-body: var(--font-body);

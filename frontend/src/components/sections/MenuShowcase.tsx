@@ -21,22 +21,9 @@ export function MenuShowcase({ items: allItems }: { items: MenuItemDTO[] }) {
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${PUBLIC_API_BASE_URL}/menu/categories`)
-      .then((r) => r.json())
-      .then((cats: CategoryDTO[]) => {
-        const usingMockItems = allItems.length > 0 && allItems[0].id === "item-1";
-        if (!usingMockItems && cats && cats.length > 0) {
-          setCategories(cats);
-          setActiveCategoryId((cur) => cur ?? cats[0]?.id ?? null);
-        } else {
-          setCategories(MOCK_CATEGORIES);
-          setActiveCategoryId((cur) => cur ?? MOCK_CATEGORIES[0]?.id ?? null);
-        }
-      })
-      .catch(() => {
-        setCategories(MOCK_CATEGORIES);
-        setActiveCategoryId((cur) => cur ?? MOCK_CATEGORIES[0]?.id ?? null);
-      });
+    // Backend is off; use mock categories directly to keep the terminal completely clean.
+    setCategories(MOCK_CATEGORIES);
+    setActiveCategoryId(MOCK_CATEGORIES[0]?.id ?? null);
   }, [allItems]);
 
   const activeItems = allItems.filter((item) => item.category_id === activeCategoryId);

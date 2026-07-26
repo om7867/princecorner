@@ -133,6 +133,7 @@ export default function AdminLoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1.5 w-full rounded-xl border border-linen/20 bg-espresso/40 px-4 py-3 text-sm text-linen placeholder:text-linen/40 focus:border-saffron focus:outline-none"
             placeholder="you@restaurant.com"
+            suppressHydrationWarning
           />
 
           <label htmlFor="adm-password" className="mt-4 block text-xs font-medium uppercase tracking-[0.15em] text-linen/70">

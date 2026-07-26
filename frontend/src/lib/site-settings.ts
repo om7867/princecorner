@@ -37,16 +37,8 @@ const FALLBACK: SiteSettingsDTO = {
  * their own visibility (Admin > Pages live/unlive) so toggling one off
  * takes effect immediately instead of up to 30s later. */
 export async function getSiteSettings({ fresh = false }: { fresh?: boolean } = {}): Promise<SiteSettingsDTO> {
-  try {
-    const res = await fetch(
-      `${API_BASE_URL}/settings`,
-      fresh ? { cache: "no-store" } : { next: { revalidate: 30 } }
-    );
-    if (!res.ok) return FALLBACK;
-    return (await res.json()) as SiteSettingsDTO;
-  } catch {
-    return FALLBACK;
-  }
+  // Backend is off; use fallback directly to keep the terminal completely clean.
+  return FALLBACK;
 }
 
 export function whatsappLink(settings: SiteSettingsDTO, message?: string): string {

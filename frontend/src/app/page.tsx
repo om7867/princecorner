@@ -19,13 +19,7 @@ export const dynamic = "force-dynamic";
 import { MOCK_MENU_ITEMS } from "@/data/mockMenu";
 
 async function getMenuItems(): Promise<MenuItemDTO[]> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/menu`, { next: { revalidate: 10 } });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.length > 0) return data;
-    }
-  } catch (e) {}
+  // Backend is off; use mock items directly to keep the terminal clean.
   return MOCK_MENU_ITEMS;
 }
 

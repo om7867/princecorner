@@ -13,13 +13,12 @@ export function EditorialHero({ siteName }: { siteName: string }) {
     >
       {/* Background Image Container */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-[#0e0b08]">
-        {/* Parallax wrapper made taller than the screen to prevent gaps when translating down */}
-        <div className="relative h-[120%] w-full -top-[10%]" data-parallax="0.15">
+        <div className="relative h-full w-full">
           <Image
             src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?q=80&w=2070&auto=format&fit=crop"
             alt={`${siteName} Vegetarian Dining Experience`}
             fill
-            className="object-cover opacity-60"
+            className="object-cover opacity-60 scale-105 transition-transform duration-1000"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0e0b08]/40 to-[#0e0b08]" />
