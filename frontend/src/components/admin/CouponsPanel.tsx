@@ -136,9 +136,9 @@ export function CouponsPanel() {
             <div>
               <p className="font-display text-lg italic text-linen">{c.code}</p>
               <p className="text-xs text-linen/50">
-                {c.type === "percentage" && `${c.value}% off, min $${c.min_order_amount}${c.max_discount ? `, capped at $${c.max_discount}` : ""}`}
-                {c.type === "flat" && `$${c.value} off, min $${c.min_order_amount}`}
-                {c.type === "bogo" && `BOGO — cheapest item free, min $${c.min_order_amount}`}
+                {c.type === "percentage" && `${c.value}% off, min ₹${c.min_order_amount}${c.max_discount ? `, capped at ₹${c.max_discount}` : ""}`}
+                {c.type === "flat" && `₹${c.value} off, min ₹${c.min_order_amount}`}
+                {c.type === "bogo" && `BOGO — cheapest item free, min ₹${c.min_order_amount}`}
                 {" · used "}
                 {c.times_used}
                 {c.usage_limit ? ` / ${c.usage_limit}` : ""} times

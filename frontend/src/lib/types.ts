@@ -74,6 +74,7 @@ export type OrderDTO = {
   items: OrderItemDTO[];
   table_code: string;
   is_billed: boolean;
+  channel: "dine_in" | "online";
 };
 
 export type ReservationStatus = "pending" | "confirmed" | "cancelled";
@@ -134,7 +135,7 @@ export const TOGGLEABLE_PAGES = [
 ] as const;
 
 export function formatMoney(value: string | number): string {
-  return `$${Number(value).toFixed(2)}`;
+  return `₹${Number(value).toFixed(2)}`;
 }
 
 // ── Billing ────────────────────────────────────────────────────────────

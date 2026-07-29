@@ -12,6 +12,14 @@ const COLUMNS: { id: OrderStatus; label: string; action?: string; next?: OrderSt
   { id: "served", label: "Served" },
 ];
 
+type ChannelFilter = "all" | "dine_in" | "online";
+
+const CHANNEL_FILTERS: { id: ChannelFilter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "dine_in", label: "Dine-in" },
+  { id: "online", label: "Online" },
+];
+
 function minutesAgo(iso: string): number {
   return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
 }
@@ -27,6 +35,7 @@ function ageClasses(status: OrderStatus, mins: number): string {
 export function OrdersBoard({ heading = "Live orders" }: { heading?: string }) {
   const [orders, setOrders] = useState<OrderDTO[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [channelFilter, setChannelFilter] = useState<ChannelFilter>("all");
   const [, forceTick] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
   const retryRef = useRef(0);
@@ -129,6 +138,21 @@ export function OrdersBoard({ heading = "Live orders" }: { heading?: string }) {
         </span>
       </div>
 
+      <div className="mt-4 flex flex-wrap gap-2">
+        {CHANNEL_FILTERS.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setChannelFilter(f.id)}
+            className={`rounded-full px-4 py-1.5 font-body text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
+              channelFilter === f.id ? "bg-saffron text-espresso" : "bg-linen/10 text-linen/70 hover:bg-linen/15"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {loaded && orders.length === 0 && (
         <div className="mt-16 rounded-3xl border border-dashed border-linen/15 p-12 text-center">
           <p className="font-display text-xl italic text-linen/70">No orders yet</p>
@@ -141,7 +165,9 @@ export function OrdersBoard({ heading = "Live orders" }: { heading?: string }) {
 
       <div className="mt-8 grid gap-4 lg:grid-cols-4">
         {COLUMNS.map((column) => {
-          const columnOrders = orders.filter((o) => o.status === column.id);
+          const columnOrders = orders.filter(
+            (o) => o.status === column.id && (channelFilter === "all" || o.channel === channelFilter)
+          );
           return (
             <section key={column.id} aria-label={column.label}>
               <h2 className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.2em] text-linen/50">
@@ -156,9 +182,15 @@ export function OrdersBoard({ heading = "Live orders" }: { heading?: string }) {
                       className={`rounded-2xl border-2 bg-[#221913] p-4 ${ageClasses(order.status, mins)}`}
                     >
                       <div className="flex items-baseline justify-between gap-2">
-                        <span className="rounded-lg bg-saffron px-2.5 py-1 font-display text-lg text-espresso">
-                          {order.table_code}
-                        </span>
+                        {order.channel === "online" ? (
+                          <span className="rounded-full bg-saffron/15 px-2.5 py-1 font-body text-xs font-semibold uppercase tracking-[0.1em] text-saffron">
+                            🛵 Online
+                          </span>
+                        ) : (
+                          <span className="rounded-lg bg-saffron px-2.5 py-1 font-display text-lg text-espresso">
+                            🍽️ {order.table_code}
+                          </span>
+                        )}
                         <span className="text-xs text-linen/40">
                           {mins === 0 ? "just now" : `${mins} min`}
                         </span>

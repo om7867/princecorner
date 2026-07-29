@@ -16,6 +16,17 @@ class OrderStatusEnum(str, enum.Enum):
     cancelled = "cancelled"
 
 
+class OrderChannelEnum(str, enum.Enum):
+    """How the order was placed — dine_in is a real table scanned via QR;
+    online is placed through a branch's "Order Online" entry point with no
+    physical table (attached to that branch's virtual `ONLINE` table row).
+    Purely informational for admin display/filtering — the ordering/kitchen
+    flow itself is identical either way."""
+
+    dine_in = "dine_in"
+    online = "online"
+
+
 STATUS_FLOW: list[OrderStatusEnum] = [
     OrderStatusEnum.received,
     OrderStatusEnum.preparing,
@@ -44,6 +55,9 @@ class Order(Base):
 
     status: Mapped[OrderStatusEnum] = mapped_column(
         Enum(OrderStatusEnum, native_enum=False, length=20), default=OrderStatusEnum.received, index=True
+    )
+    channel: Mapped[OrderChannelEnum] = mapped_column(
+        Enum(OrderChannelEnum, native_enum=False, length=20), default=OrderChannelEnum.dine_in
     )
     note: Mapped[str] = mapped_column(String(1000), default="")
 

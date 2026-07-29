@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.order import OrderStatusEnum
+from app.models.order import OrderChannelEnum, OrderStatusEnum
 
 
 class OrderLineAddonIn(BaseModel):
@@ -21,6 +21,7 @@ class OrderCreate(BaseModel):
     table: str
     note: str = ""
     lines: list[OrderLineIn]
+    channel: OrderChannelEnum = OrderChannelEnum.dine_in
 
 
 class OrderItemAddonRead(BaseModel):
@@ -44,6 +45,7 @@ class OrderRead(BaseModel):
     id: str
     display_code: str
     status: OrderStatusEnum
+    channel: OrderChannelEnum
     note: str
     subtotal: Decimal
     total: Decimal

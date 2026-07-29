@@ -226,6 +226,11 @@ export function PaymentsPanel() {
                         className="h-4 w-4"
                       />
                       <span className="text-sm text-linen">{o.display_code}</span>
+                      {o.channel === "online" && (
+                        <span className="rounded-full bg-saffron/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-saffron">
+                          🛵 Online
+                        </span>
+                      )}
                     </span>
                     <span className="text-sm text-saffron">{formatMoney(o.total)}</span>
                   </label>

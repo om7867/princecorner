@@ -188,9 +188,9 @@ export function GlobalCouponsPanel() {
               <p className="font-display text-lg italic text-linen">{c.code}</p>
               <p className="text-xs text-linen/50">
                 {c.type === "percentage" &&
-                  `${c.value}% off, min $${c.min_order_amount}${c.max_discount ? `, capped at $${c.max_discount}` : ""}`}
-                {c.type === "flat" && `$${c.value} off, min $${c.min_order_amount}`}
-                {c.type === "bogo" && `BOGO — cheapest item free, min $${c.min_order_amount}`}
+                  `${c.value}% off, min ₹${c.min_order_amount}${c.max_discount ? `, capped at ₹${c.max_discount}` : ""}`}
+                {c.type === "flat" && `₹${c.value} off, min ₹${c.min_order_amount}`}
+                {c.type === "bogo" && `BOGO — cheapest item free, min ₹${c.min_order_amount}`}
                 {c.usage_limit ? ` · limit ${c.usage_limit} uses per branch` : ""}
                 {c.expires_at ? ` · expires ${c.expires_at.slice(0, 10)}` : ""}
               </p>

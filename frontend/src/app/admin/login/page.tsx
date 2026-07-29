@@ -27,6 +27,13 @@ const DEMO_CARDS = [
     email: "demo.branchadmin@example.com",
     password: "DemoPass123!",
   },
+  {
+    role: "Prince Corner",
+    tagline: "A real restaurant, live",
+    detail: "The full flow — QR order to kitchen screen to dashboard.",
+    email: "owner@princecorner.example.com",
+    password: "PrinceCorner@123",
+  },
 ] as const;
 
 export default function AdminLoginPage() {

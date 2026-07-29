@@ -384,7 +384,7 @@ export function RestaurantClient({ items, siteName }: { items: MenuItemDTO[]; si
                 </ul>
                 <div className="w-full h-[1px] bg-white/10 mt-8 mb-6" />
                 <p className="font-body text-xs text-saffron tracking-[0.2em] uppercase text-right">
-                  Full pairing flight +$45
+                  Full pairing flight +₹45
                 </p>
               </div>
 

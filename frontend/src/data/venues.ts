@@ -62,7 +62,7 @@ export const VENUES: Venue[] = [
       { q: "Do you take walk-ins?", a: "We hold a third of the dining room for walk-ins every night. Come early or late and we'll usually find you a seat within twenty minutes." },
       { q: "Can you handle dietary restrictions?", a: "Absolutely — the tasting menu adapts to vegetarian, gluten-free, and most allergies. Tell us when you book and the kitchen will plan around you." },
       { q: "Is there a dress code?", a: "No. Come as you are — the fire is doing the dressing up." },
-      { q: "Do you charge corkage?", a: "You're welcome to bring a special bottle. Corkage is $25, waived on Sundays." },
+      { q: "Do you charge corkage?", a: "You're welcome to bring a special bottle. Corkage is ₹25, waived on Sundays." },
     ],
   },
   {
@@ -207,7 +207,7 @@ export function getVenue(slug: string): Venue | undefined {
 
 export const RESTAURANT_TASTING = {
   title: "The Tasting",
-  price: "$78 per guest",
+  price: "₹78 per guest",
   note: "Five courses, changed with the market. Wine pairing available.",
   courses: [
     { order: "I", name: "To Begin", dish: "Three-day sourdough, whipped cultured butter" },
@@ -226,10 +226,10 @@ export const RESTAURANT_HOURS = [
 ];
 
 export const CAFE_BREWS = [
-  { name: "Espresso", detail: "Single origin, 18g in / 36g out, stone fruit and cocoa", price: "$4" },
-  { name: "V60 Pour-Over", detail: "Hand-poured over three minutes, floral and bright", price: "$6" },
-  { name: "Cold Brew", detail: "Steeped 18 hours, chocolate-forward, served over one big cube", price: "$5.5" },
-  { name: "Batch Filter", detail: "The everyday cup — balanced, comforting, bottomless before 9am", price: "$3.5" },
+  { name: "Espresso", detail: "Single origin, 18g in / 36g out, stone fruit and cocoa", price: "₹4" },
+  { name: "V60 Pour-Over", detail: "Hand-poured over three minutes, floral and bright", price: "₹6" },
+  { name: "Cold Brew", detail: "Steeped 18 hours, chocolate-forward, served over one big cube", price: "₹5.5" },
+  { name: "Batch Filter", detail: "The everyday cup — balanced, comforting, bottomless before 9am", price: "₹3.5" },
 ];
 
 export const CAFE_MORNING = [
@@ -240,11 +240,11 @@ export const CAFE_MORNING = [
 ];
 
 export const BAR_COCKTAILS = [
-  { num: "01", name: "Smoked Old Fashioned", detail: "Bourbon, demerara, aromatic bitters, applewood smoke", price: "$15" },
-  { num: "02", name: "Sage Garden Fizz", detail: "Gin, garden sage, elderflower, soda, citrus oil", price: "$13" },
-  { num: "03", name: "Terracotta Negroni", detail: "Blood orange gin, sweet vermouth, campari, burnt orange coin", price: "$14" },
-  { num: "04", name: "Espresso Martini", detail: "House espresso, vodka, coffee liqueur, saline", price: "$14" },
-  { num: "05", name: "Linen Spritz", detail: "White vermouth, chamomile, prosecco, lemon ribbon", price: "$12" },
+  { num: "01", name: "Smoked Old Fashioned", detail: "Bourbon, demerara, aromatic bitters, applewood smoke", price: "₹15" },
+  { num: "02", name: "Sage Garden Fizz", detail: "Gin, garden sage, elderflower, soda, citrus oil", price: "₹13" },
+  { num: "03", name: "Terracotta Negroni", detail: "Blood orange gin, sweet vermouth, campari, burnt orange coin", price: "₹14" },
+  { num: "04", name: "Espresso Martini", detail: "House espresso, vodka, coffee liqueur, saline", price: "₹14" },
+  { num: "05", name: "Linen Spritz", detail: "White vermouth, chamomile, prosecco, lemon ribbon", price: "₹12" },
 ];
 
 export const BAR_LIBRARY = [
@@ -268,9 +268,9 @@ export const BAKERY_SCHEDULE = [
 ];
 
 export const BAKERY_BREADS = [
-  { name: "Country Levain", detail: "Our signature — 3-day ferment, dark crust", price: "$9" },
-  { name: "Seeded Rye", detail: "Dense, malty, built for butter", price: "$10" },
-  { name: "Olive & Rosemary", detail: "Castelvetrano olives folded by hand", price: "$11" },
-  { name: "Baguette", detail: "Baked twice daily — morning and 3pm", price: "$5" },
-  { name: "Cardamom Knot", detail: "Buttery, fragrant, and gone by 10am", price: "$6" },
+  { name: "Country Levain", detail: "Our signature — 3-day ferment, dark crust", price: "₹9" },
+  { name: "Seeded Rye", detail: "Dense, malty, built for butter", price: "₹10" },
+  { name: "Olive & Rosemary", detail: "Castelvetrano olives folded by hand", price: "₹11" },
+  { name: "Baguette", detail: "Baked twice daily — morning and 3pm", price: "₹5" },
+  { name: "Cardamom Knot", detail: "Buttery, fragrant, and gone by 10am", price: "₹6" },
 ];

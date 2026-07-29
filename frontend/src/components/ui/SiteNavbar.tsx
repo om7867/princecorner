@@ -66,6 +66,7 @@ export function SiteNavbar() {
       accent: v.accent,
     })),
     ...(hiddenPages.includes("menu") ? [] : [{ href: "/menu", label: "Menu", accent: "#e7a73a" }]),
+    { href: "/prince-corner-experience", label: "Prince's Corner", accent: "#D4AF37" },
   ];
 
   return (

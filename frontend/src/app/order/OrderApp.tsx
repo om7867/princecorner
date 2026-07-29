@@ -24,7 +24,8 @@ export function OrderApp() {
   const params = useSearchParams();
   const table = (params.get("table") ?? "").toUpperCase();
   const restaurantSlug = params.get("r") ?? "";
-  const { settings } = useSiteSettings();
+  const isOnlineOrder = table === "ONLINE";
+  const { settings } = useSiteSettings(restaurantSlug || undefined);
 
   // Appends `restaurant=<slug>` (as `&` or the first `?`, whichever fits the
   // URL) only when this table's QR code carried an `r` param — omitted
@@ -41,6 +42,7 @@ export function OrderApp() {
   const [menu, setMenu] = useState<MenuItemDTO[]>([]);
   const [categories, setCategories] = useState<CategoryDTO[]>([]);
   const [menuLoaded, setMenuLoaded] = useState(false);
+  const [menuLoadFailed, setMenuLoadFailed] = useState(false);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [note, setNote] = useState("");
@@ -58,12 +60,19 @@ export function OrderApp() {
 
   const loadMenu = useCallback(() => {
     fetch(withRestaurant(`${PUBLIC_API_BASE_URL}/menu`))
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`menu fetch failed: ${r.status}`);
+        return r.json();
+      })
       .then((items: MenuItemDTO[]) => {
         setMenu(items);
         setMenuLoaded(true);
+        setMenuLoadFailed(false);
       })
-      .catch(() => setMenuLoaded(true));
+      .catch(() => {
+        setMenuLoaded(true);
+        setMenuLoadFailed(true);
+      });
   }, [withRestaurant]);
 
   useEffect(() => {
@@ -188,6 +197,7 @@ export function OrderApp() {
     return {
       table,
       note,
+      channel: isOnlineOrder ? "online" : "dine_in",
       lines: cartLines.map((l) => ({ menu_item_id: l.item.id, quantity: l.qty, addon_ids: [] })),
     };
   }
@@ -338,7 +348,13 @@ export function OrderApp() {
           <div>
             <p className="font-display text-xl italic text-linen">{restaurantName}</p>
             <p className="text-[10px] uppercase tracking-[0.3em] text-linen/50 mt-0.5">
-              Table <span className="font-semibold text-saffron">{table}</span>
+              {isOnlineOrder ? (
+                <span className="font-semibold text-saffron">Online Order</span>
+              ) : (
+                <>
+                  Table <span className="font-semibold text-saffron">{table}</span>
+                </>
+              )}
             </p>
           </div>
           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[9px] uppercase tracking-widest font-medium text-linen/70">
@@ -450,7 +466,21 @@ export function OrderApp() {
             Array.from({ length: 3 }).map((_, i) => (
               <li key={i} className="h-28 animate-pulse rounded-[1.5rem] bg-white/5 border border-white/5" aria-hidden />
             ))}
-          {menuLoaded && items.length === 0 && (
+          {menuLoaded && menuLoadFailed && (
+            <li className="rounded-[1.5rem] border border-white/5 bg-[#14100b]/50 p-8 text-center">
+              <p className="font-body text-xs uppercase tracking-widest text-linen/40">
+                Couldn&rsquo;t load the menu — check your connection.
+              </p>
+              <button
+                type="button"
+                onClick={loadMenu}
+                className="mt-4 rounded-full border border-saffron/40 px-5 py-2 font-body text-xs font-semibold uppercase tracking-widest text-saffron transition-colors hover:bg-saffron/10"
+              >
+                Try again
+              </button>
+            </li>
+          )}
+          {menuLoaded && !menuLoadFailed && items.length === 0 && (
             <li className="rounded-[1.5rem] border border-white/5 bg-[#14100b]/50 p-8 text-center font-body text-xs uppercase tracking-widest text-linen/40">
               Everything in this category just sold out — check back shortly.
             </li>
@@ -541,7 +571,10 @@ export function OrderApp() {
           <div className="w-full max-w-lg rounded-t-[2rem] bg-[#14100b] border-t border-white/10 p-6 pb-10 shadow-[0_-20px_40px_rgba(0,0,0,0.5)] motion-safe:animate-[fade-rise_0.35s_var(--ease-cubic)]">
             <div className="flex items-center justify-between mb-2">
               <h2 className="font-display text-2xl italic text-linen">
-                Your Order <span className="text-saffron font-body not-italic text-sm ml-2">Table {table}</span>
+                Your Order{" "}
+                <span className="text-saffron font-body not-italic text-sm ml-2">
+                  {isOnlineOrder ? "Online Order" : `Table ${table}`}
+                </span>
               </h2>
               <button
                 onClick={() => setCartOpen(false)}
@@ -611,7 +644,7 @@ export function OrderApp() {
                     : "border-white/10 bg-transparent text-linen/40"
                 }`}
               >
-                Pay at counter
+                {isOnlineOrder ? "Cash on delivery" : "Pay at counter"}
               </button>
               <button
                 type="button"
@@ -649,7 +682,9 @@ export function OrderApp() {
             <p className="mt-4 text-center font-body text-[10px] leading-relaxed text-linen/30 max-w-xs mx-auto">
               {paymentMethod === "online"
                 ? "Your order goes to the kitchen the moment payment is confirmed."
-                : `Your food is delivered to Table ${table}. Pay at the counter or ask your server.`}
+                : isOnlineOrder
+                  ? "Your order is being prepared for pickup/delivery. Pay cash when it arrives."
+                  : `Your food is delivered to Table ${table}. Pay at the counter or ask your server.`}
             </p>
           </div>
         </div>
@@ -658,7 +693,7 @@ export function OrderApp() {
       {demoPrepayOpen && (
         <DemoCardModal
           restaurantName={restaurantName}
-          amountLabel={`$${cartTotal.toFixed(2)}`}
+          amountLabel={`₹${cartTotal.toFixed(2)}`}
           onClose={() => setDemoPrepayOpen(false)}
           onSubmit={async () => {
             const ok = await submitDemoPrepay();

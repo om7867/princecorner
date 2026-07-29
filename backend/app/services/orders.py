@@ -86,6 +86,7 @@ async def create_order(db: AsyncSession, restaurant_id: str, payload: OrderCreat
         table_id=table.id,
         display_code=_display_code(),
         status=OrderStatusEnum.received,
+        channel=payload.channel,
         note=payload.note.strip()[:1000],
         subtotal=0,
         total=0,

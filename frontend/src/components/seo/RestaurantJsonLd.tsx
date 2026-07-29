@@ -19,7 +19,7 @@ export async function RestaurantJsonLd() {
     email: settings.email,
     image: [unsplash("1414235077428-338989a2e8c0", 1200)],
     servesCuisine: ["Modern European", "Coffee", "Cocktails", "Bakery"],
-    priceRange: "$$",
+    priceRange: "₹₹",
     acceptsReservations: "True",
     address: {
       "@type": "PostalAddress",

@@ -31,7 +31,7 @@ from app.models.site_settings import SiteSettings
 from app.models.table import RestaurantTable
 from app.models.user import RoleEnum, User
 from app.schemas.organization import BranchCreate
-from app.seed_demo_data import engagement, inventory_staff, menu_promotions, platform_org
+from app.seed_demo_data import engagement, inventory_staff, menu_promotions, platform_org, prince_corner
 from app.services.organization import create_branch
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -327,6 +327,7 @@ async def seed() -> None:
     async with AsyncSessionLocal() as db:
         await seed_platform_owner(db)
         await seed_demo_organization(db)
+        await prince_corner.seed(db)
 
         existing = await db.execute(select(Restaurant).where(Restaurant.slug == DEFAULT_RESTAURANT_SLUG))
         if existing.scalar_one_or_none():
