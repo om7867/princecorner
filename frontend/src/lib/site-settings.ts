@@ -2,7 +2,7 @@ import { API_BASE_URL } from "@/lib/env";
 import type { SiteSettingsDTO } from "@/lib/types";
 
 const FALLBACK: SiteSettingsDTO = {
-  name: "Your Restaurant Name",
+  name: "Prince Corner",
   restaurant_slug: "",
   tagline: null,
   description: null,

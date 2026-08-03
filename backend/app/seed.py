@@ -334,7 +334,7 @@ async def seed() -> None:
             print("Already seeded — nothing to do.")
             return
 
-        restaurant = Restaurant(slug=DEFAULT_RESTAURANT_SLUG, name="Your Restaurant Name")
+        restaurant = Restaurant(slug=DEFAULT_RESTAURANT_SLUG, name="Prince Corner")
         db.add(restaurant)
         await db.flush()
 
