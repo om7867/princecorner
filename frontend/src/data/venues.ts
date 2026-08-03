@@ -1,6 +1,4 @@
-import { unsplash } from "@/lib/unsplash";
-
-export type VenueSlug = "restaurant" | "cafe" | "bar" | "bakery";
+export type VenueSlug = "restaurant" | "cafe" | "beverages" | "bakery";
 export type ModelTone = "warm" | "sage" | "charred" | "cream";
 
 export type Venue = {
@@ -8,14 +6,11 @@ export type Venue = {
   name: string;
   tagline: string;
   intro: string;
-  /** Tone for the procedural 3D dish in the venue hero. */
   dishTone: ModelTone;
-  /** Accent hex used for the hero glow — stays within the brand palette. */
   accent: string;
   heroPhoto: { src: string; alt: string };
   gallery: { src: string; alt: string }[];
   featuredIds: string[];
-  /** Above-the-fold essentials — hours, address, phone (restaurant-site best practice). */
   quickInfo: { hours: string; address: string; phone: string };
   faqs: { q: string; a: string }[];
 };
@@ -24,177 +19,170 @@ export const VENUES: Venue[] = [
   {
     slug: "restaurant",
     name: "The Restaurant",
-    tagline: "Dinner, unhurried",
+    tagline: "Pure Veg Punjabi & Tandoor",
     intro:
-      "Golden-hour lighting, hand-thrown ceramics, and a short seasonal menu cooked over fire. This is the room at full depth — settle in.",
+      "Rich Paneer Butter Masala, slow-cooked Dal Makhani, and golden tandoori breads cooked fresh over glowing hot clay tandoors.",
     dishTone: "charred",
-    accent: "#e7a73a",
+    accent: "#b71c1c",
     heroPhoto: {
-      src: unsplash("1414235077428-338989a2e8c0", 1600),
-      alt: "A plated dish being finished at a candlelit restaurant table",
+      src: "/food-photos/food_01.jpg",
+      alt: "Authentic Paneer Butter Masala in rich tomato gravy",
     },
     gallery: [
       {
-        src: unsplash("1631515243349-e0cb75fb8d3a"),
-        alt: "Fine-dining Indian vegetarian thali",
+        src: "/food-photos/food_02.jpg",
+        alt: "Golden tandoori kulcha with chole",
       },
       {
-        src: unsplash("1585937421612-70a008356fbe"),
-        alt: "Rich paneer delicacy on a rustic table",
+        src: "/food-photos/food_03.jpg",
+        alt: "Prince Corner full Punjabi Thali spread",
       },
       {
-        src: unsplash("1512621776951-a57141f2eefd"),
-        alt: "A vibrant seasonal bowl from the kitchen",
+        src: "/food-photos/food_04.jpg",
+        alt: "Sizzling Paneer Tikka with mint chutney",
       },
     ],
     featuredIds: [
-      "truffle-pav-bhaji",
-      "smoked-paneer-tikka",
-      "wild-mushroom-risotto",
-      "saffron-pulav",
+      "butter-paneer-masala",
+      "dal-makhani",
+      "paneer-tikka-masala",
+      "prince-punjabi-thali",
     ],
     quickInfo: {
-      hours: "Tue – Sun · from 5:30 pm",
-      address: "14 Baker's Lane, Old Mill District",
-      phone: "+1 (000) 000-0000",
+      hours: "Daily · 11:00 am – 11:00 pm",
+      address: "Near Rameshwar Shopping Center, Vatva Road, Isanpur",
+      phone: "+91 98765 43210",
     },
     faqs: [
-      { q: "Do you take walk-ins?", a: "We hold a third of the dining room for walk-ins every night. Come early or late and we'll usually find you a seat within twenty minutes." },
-      { q: "Can you handle dietary restrictions?", a: "Absolutely — the tasting menu adapts to vegetarian, gluten-free, and most allergies. Tell us when you book and the kitchen will plan around you." },
-      { q: "Is there a dress code?", a: "No. Come as you are — the fire is doing the dressing up." },
-      { q: "Do you charge corkage?", a: "You're welcome to bring a special bottle. Corkage is ₹25, waived on Sundays." },
+      { q: "Is the restaurant 100% vegetarian?", a: "Yes! We are strictly 100% pure vegetarian with Jain options available for all major dishes." },
+      { q: "Do you offer delivery?", a: "Yes, we deliver piping hot meals straight to your door across Ahmedabad." },
+      { q: "Can we book tables for family gatherings?", a: "Absoluty! You can reserve tables online or call our manager directly." },
     ],
   },
   {
     slug: "cafe",
-    name: "The Café",
-    tagline: "Mornings, poured slowly",
+    name: "South Indian Dosa Counter",
+    tagline: "Crisp Dosas & Steamed Idlis",
     intro:
-      "Single-origin beans roasted in-house, milk steamed to silk, and a counter full of things still warm from the oven. Stay for one more cup.",
+      "Paper-thin golden dosas, soft steamed idlis, and crispy medu vadas served with hot sambar and fresh coconut chutney.",
     dishTone: "cream",
-    accent: "#c1622c",
+    accent: "#d4af37",
     heroPhoto: {
-      src: unsplash("1509042239860-f550ce710b93", 1600),
-      alt: "Hand-poured espresso cups with latte art on a café counter",
+      src: "/food-photos/food_05.jpg",
+      alt: "Golden crisp Masala Dosa with sambar and coconut chutney",
     },
     gallery: [
       {
-        src: unsplash("1495474472287-4d71bcdd2085"),
-        alt: "Friends raising latte cups together",
+        src: "/food-photos/food_06.jpg",
+        alt: "Onion Tomato Uttapam on banana leaf",
       },
       {
-        src: unsplash("1567620905732-2d1ec7ab7445"),
-        alt: "Golden pancake stack with syrup being poured",
+        src: "/food-photos/food_07.jpg",
+        alt: "Crisp Lacy Rava Dosa",
       },
       {
-        src: unsplash("1563805042-7684c019e1cb"),
-        alt: "A layered dessert jar from the café counter",
+        src: "/menu-photos/menu_04.jpg",
+        alt: "Steamed Idli Sambar",
       },
     ],
     featuredIds: [
-      "hand-poured-espresso",
-      "olive-oil-cake",
-      "burrata-fig",
-      "honey-panna-cotta",
+      "masala-dosa",
+      "idli-sambar",
+      "uttapam",
+      "medu-vada",
     ],
     quickInfo: {
-      hours: "Daily · 7 am – 4 pm",
-      address: "14 Baker's Lane, Old Mill District",
-      phone: "+1 (000) 000-0000",
+      hours: "Daily · 8:00 am – 10:30 pm",
+      address: "Maninagar Char Rasta, Rambaug Road",
+      phone: "+91 98765 43210",
     },
     faqs: [
-      { q: "Can I work on my laptop?", a: "Weekdays, yes — the long table has outlets and the Wi-Fi is fast. Weekends we keep the tables for conversation." },
-      { q: "Are dogs welcome?", a: "On the terrace, always. There's a water bowl and usually a biscuit going spare." },
-      { q: "Do you have decaf and alt milks?", a: "A properly good decaf, plus oat, almond, and soy at no extra charge." },
-      { q: "Do you sell your beans?", a: "Every week's roast is on the shelf in 250g bags — whole bean or ground to order." },
+      { q: "Are dosas made fresh to order?", a: "Every single dosa is spread live on hot tawas upon ordering." },
+      { q: "Do you have Jain coconut chutney?", a: "Yes, our sambar and chutneys are available in Jain options." },
     ],
   },
   {
-    slug: "bar",
-    name: "The Bar",
-    tagline: "Evenings, stirred not rushed",
+    slug: "beverages",
+    name: "Beverage & Falooda Bar",
+    tagline: "Royal Faloodas & Chilled Lassi",
     intro:
-      "Applewood smoke, garden herbs, and spirits worth sipping. A low-lit corner for long conversations and drinks built like small rituals.",
+      "Layers of rose syrup, basil seeds, rabri, and kulfi scoops alongside chilled dryfruit lassi and digestive masala chaas.",
     dishTone: "sage",
-    accent: "#6b7a4f",
+    accent: "#e7a73a",
     heroPhoto: {
-      src: unsplash("1470337458703-46ad1756a187", 1600),
-      alt: "An old fashioned cocktail being strained over ice at the bar",
+      src: "/food-photos/food_16.jpg",
+      alt: "Royal Falooda with kulfi and rose syrup",
     },
     gallery: [
       {
-        src: unsplash("1551538827-9c037cb4f32a"),
-        alt: "A garden fizz cocktail with fresh herbs and lime",
+        src: "/menu-photos/menu_16.jpg",
+        alt: "Chilled Masala Chaas with roasted cumin",
       },
       {
-        src: unsplash("1551024506-0bccd828d307"),
-        alt: "Dark chocolate dessert with warm caramel pour",
+        src: "/food-photos/food_14.jpg",
+        alt: "Frothy Cold Coffee glass",
       },
       {
-        src: unsplash("1504674900247-0877df9cc836"),
-        alt: "Plates of food styled on the bar counter",
+        src: "/food-photos/food_15.jpg",
+        alt: "Warm Gulab Jamun with syrup",
       },
     ],
     featuredIds: [
-      "smoked-old-fashioned",
-      "sage-garden-fizz",
-      "truffle-fries",
-      "dark-chocolate-tart",
+      "royal-falooda",
+      "masala-chaas",
+      "cold-coffee",
+      "fresh-lime-soda",
     ],
     quickInfo: {
-      hours: "Wed – Sun · 5 pm til late",
-      address: "14 Baker's Lane, Old Mill District",
-      phone: "+1 (000) 000-0000",
+      hours: "Daily · 11:00 am – 11:30 pm",
+      address: "Satellite Road, Near Jodhpur Cross Road",
+      phone: "+91 98765 43210",
     },
     faqs: [
-      { q: "Do I need a reservation?", a: "The bar itself is walk-in only. Booths for four or more can be booked ahead — worth it on Thursdays when the jazz trio plays." },
-      { q: "When is happy hour?", a: "Golden hour runs Friday 5–7 pm: half-price spritzes and a free plate of sourdough with anything smoked." },
-      { q: "How late does the kitchen run?", a: "Small plates until 11 pm, cheese and dessert until close." },
-      { q: "Can you make it non-alcoholic?", a: "Every drink on the list has a zero-proof build we're genuinely proud of. Just ask." },
+      { q: "Do you serve fresh juices?", a: "Yes! Freshly squeezed orange, pineapple, and watermelon juices served all day." },
+      { q: "Are desserts eggless?", a: "100% eggless desserts and pure milk ice creams only." },
     ],
   },
   {
     slug: "bakery",
-    name: "The Bakery",
-    tagline: "Bread, three days in the making",
+    name: "Street Food & Tawa Counter",
+    tagline: "Pav Bhaji & Live Tawa Specialties",
     intro:
-      "Levain fed by hand, crusts that crackle, and shelves that empty by noon. Everything here starts with flour, water, salt, and patience.",
+      "Sizzling Pav Bhaji slow-cooked with Amul butter, butter-rich Tawa Pulao, and fiery wok-tossed Hakka Noodles.",
     dishTone: "warm",
-    accent: "#e7a73a",
+    accent: "#b71c1c",
     heroPhoto: {
-      src: unsplash("1517433670267-08bbd4be890f", 1600),
-      alt: "Bakery shelves stacked with fresh pastries and baguettes",
+      src: "/food-photos/food_11.jpg",
+      alt: "Prince Special Pav Bhaji with buttered pav",
     },
     gallery: [
       {
-        src: unsplash("1509440159596-0249088772ff"),
-        alt: "Rustic sourdough loaves dusted with flour",
+        src: "/food-photos/food_08.jpg",
+        alt: "Wok-tossed Hakka Noodles",
       },
       {
-        src: unsplash("1563805042-7684c019e1cb"),
-        alt: "Layered chocolate dessert jar with cream",
+        src: "/food-photos/food_09.jpg",
+        alt: "Chilli Paneer with bell peppers",
       },
       {
-        src: unsplash("1567620905732-2d1ec7ab7445"),
-        alt: "A golden stack of pancakes with syrup at the bakery",
+        src: "/food-photos/food_12.jpg",
+        alt: "Crisp Pani Puri plate",
       },
     ],
     featuredIds: [
-      "sourdough-board",
-      "olive-oil-cake",
-      "dark-chocolate-tart",
-      "honey-panna-cotta",
+      "pav-bhaji",
+      "vada-pav",
+      "pani-puri",
+      "bhel-puri",
     ],
     quickInfo: {
-      hours: "Daily · 6:30 am – sold out",
-      address: "14 Baker's Lane, Old Mill District",
-      phone: "+1 (000) 000-0000",
+      hours: "Daily · 12:00 pm – 11:00 pm",
+      address: "Vastrapur Lake Road",
+      phone: "+91 98765 43210",
     },
     faqs: [
-      { q: "Can I reserve a loaf?", a: "Yes — order by 4 pm the day before and we'll hold it past the noon rush. Standing weekly orders welcome." },
-      { q: "Do you sell your starter?", a: "We'll happily scoop you some levain for free — bring a jar and ask any baker." },
-      { q: "Do you bake gluten-free?", a: "Wednesdays and Saturdays we run a dedicated gluten-free bake — buckwheat loaves and almond financiers." },
-      { q: "Do you supply restaurants?", a: "We bake for a handful of kitchens nearby. Write to us for the wholesale list and tasting box." },
+      { q: "Is Amul butter used for Pav Bhaji?", a: "We use 100% genuine Amul butter generously for all tawa items." },
+      { q: "Can we order extra pav?", a: "Yes, butter-grilled extra pav portions are available on order." },
     ],
   },
 ];
@@ -203,74 +191,67 @@ export function getVenue(slug: string): Venue | undefined {
   return VENUES.find((v) => v.slug === slug);
 }
 
-/* ── Per-venue editorial content (CMS-swappable) ─────────────────── */
-
 export const RESTAURANT_TASTING = {
-  title: "The Tasting",
-  price: "₹78 per guest",
-  note: "Five courses, changed with the market. Wine pairing available.",
+  title: "Prince Special Punjabi Thali",
+  price: "₹250 per thali",
+  note: "Complete traditional vegetarian feast served with unlimited warmth.",
   courses: [
-    { order: "I", name: "To Begin", dish: "Three-day sourdough, whipped cultured butter" },
-    { order: "II", name: "The Earth", dish: "Smoked paneer, charred pepper puree, mint oil" },
-    { order: "III", name: "The Field", dish: "Wild mushroom risotto, black truffle, aged parmesan" },
-    { order: "IV", name: "The Hearth", dish: "Heritage saffron pulav, slow-cooked dal makhani" },
-    { order: "V", name: "To Finish", dish: "Dark chocolate tart, espresso crust, sea salt" },
+    { order: "I", name: "Welcome Drink", dish: "Chilled Masala Chaas with mint & roasted cumin" },
+    { order: "II", name: "Starter", dish: "Paneer Tikka with green chutney & kachumber salad" },
+    { order: "III", name: "Main Curries", dish: "Butter Paneer Masala & Dal Makhani" },
+    { order: "IV", name: "Breads & Rice", dish: "2 Butter Naan, Jeera Rice & Roasted Papad" },
+    { order: "V", name: "Sweet Finish", dish: "2 Warm Gulab Jamun with Rose Syrup" },
   ],
 };
 
 export const RESTAURANT_HOURS = [
-  { days: "Tuesday — Thursday", time: "5:30 pm – 10:00 pm" },
-  { days: "Friday — Saturday", time: "5:30 pm – 11:30 pm" },
-  { days: "Sunday", time: "5:00 pm – 9:00 pm" },
-  { days: "Monday", time: "Closed — the kitchen rests" },
+  { days: "Monday — Sunday", time: "11:00 am – 11:00 pm" },
 ];
 
 export const CAFE_BREWS = [
-  { name: "Espresso", detail: "Single origin, 18g in / 36g out, stone fruit and cocoa", price: "₹4" },
-  { name: "V60 Pour-Over", detail: "Hand-poured over three minutes, floral and bright", price: "₹6" },
-  { name: "Cold Brew", detail: "Steeped 18 hours, chocolate-forward, served over one big cube", price: "₹5.5" },
-  { name: "Batch Filter", detail: "The everyday cup — balanced, comforting, bottomless before 9am", price: "₹3.5" },
+  { name: "Kesar Pista Lassi", detail: "Thick creamy yogurt whipped with saffron & pistachios", price: "₹90" },
+  { name: "Royal Special Falooda", detail: "Rose syrup, basil seeds, vermicelli & kulfi scoop", price: "₹150" },
+  { name: "Chilled Masala Chaas", detail: "Spiced buttermilk with roasted cumin & coriander", price: "₹60" },
+  { name: "Special Cutting Chai", detail: "Freshly brewed ginger-cardamom tea", price: "₹30" },
 ];
 
 export const CAFE_MORNING = [
-  { time: "7:00", event: "Doors open — first batch of filter is already brewed" },
-  { time: "7:30", event: "Pastries out of the oven and onto the counter" },
-  { time: "9:00", event: "Bottomless filter ends, pour-over bar opens" },
-  { time: "14:00", event: "Afternoon menu — toasties, cakes, and slower coffees" },
+  { time: "8:00", event: "Live Dosa Counter opens — fresh batter ready" },
+  { time: "11:00", event: "Full Punjabi Thalis & Tawa section available" },
+  { time: "16:00", event: "Evening Chaat & Falooda rush" },
+  { time: "23:00", event: "Kitchen closes" },
 ];
 
 export const BAR_COCKTAILS = [
-  { num: "01", name: "Smoked Old Fashioned", detail: "Bourbon, demerara, aromatic bitters, applewood smoke", price: "₹15" },
-  { num: "02", name: "Sage Garden Fizz", detail: "Gin, garden sage, elderflower, soda, citrus oil", price: "₹13" },
-  { num: "03", name: "Terracotta Negroni", detail: "Blood orange gin, sweet vermouth, campari, burnt orange coin", price: "₹14" },
-  { num: "04", name: "Espresso Martini", detail: "House espresso, vodka, coffee liqueur, saline", price: "₹14" },
-  { num: "05", name: "Linen Spritz", detail: "White vermouth, chamomile, prosecco, lemon ribbon", price: "₹12" },
+  { num: "01", name: "Royal Special Falooda", detail: "Rose syrup, basil seeds, rabri, kulfi scoop", price: "₹150" },
+  { num: "02", name: "Kesar Pista Lassi", detail: "Rich saffron lassi topped with crushed almonds", price: "₹90" },
+  { num: "03", name: "Fresh Mango Thandai", detail: "Chilled milk infused with nuts and crushed cardamom", price: "₹100" },
+  { num: "04", name: "Fresh Lime Soda", detail: "Sweet & salted fizzy lime refresher", price: "₹60" },
 ];
 
 export const BAR_LIBRARY = [
-  { category: "Whiskey & Bourbon", count: "14 pours" },
-  { category: "Gin", count: "9 pours" },
-  { category: "Agave", count: "7 pours" },
-  { category: "Amaro & Digestif", count: "11 pours" },
+  { category: "Punjabi Gravies", count: "12 dishes" },
+  { category: "South Indian Dosas", count: "10 varieties" },
+  { category: "Indo-Chinese Wok", count: "8 items" },
+  { category: "Desserts & Shakes", count: "9 options" },
 ];
 
 export const BAR_NIGHTS = [
-  { night: "Thursday", event: "Live jazz trio, 8pm — no cover, arrive early" },
-  { night: "Friday", event: "Golden hour: half-price spritzes, 5–7pm" },
-  { night: "Sunday", event: "Vinyl night — bring a record, the first pour is on us" },
+  { night: "Friday", event: "Weekend Special Paneer Thali Feast" },
+  { night: "Saturday", event: "Live Tawa Pav Bhaji Festival" },
+  { night: "Sunday", event: "Family Feast Combo Offers" },
 ];
 
 export const BAKERY_SCHEDULE = [
-  { time: "5:00", event: "The levain is fed — it's older than the bakery itself" },
-  { time: "6:30", event: "First loaves out of the deck oven" },
-  { time: "8:00", event: "Laminated pastries hit the counter, still warm" },
-  { time: "12:00", event: "Most days, the shelves are bare by noon" },
+  { time: "11:00", event: "Tawa heating for Pav Bhaji" },
+  { time: "13:00", event: "Lunch thali rush" },
+  { time: "18:00", event: "Evening street food & Chinese wok orders" },
+  { time: "23:00", event: "Closing" },
 ];
 
 export const BAKERY_BREADS = [
-  { name: "Country Levain", detail: "Our signature — 3-day ferment, dark crust", price: "₹9" },
-  { name: "Seeded Rye", detail: "Dense, malty, built for butter", price: "₹10" },
-  { name: "Olive & Rosemary", detail: "Castelvetrano olives folded by hand", price: "₹11" },
-  { name: "Baguette", detail: "Baked twice daily — morning and 3pm", price: "₹5" },
-  { name: "Cardamom Knot", detail: "Buttery, fragrant, and gone by 10am", price: "₹6" },
+  { name: "Prince Special Pav Bhaji", detail: "Slow-cooked bhaji with melting Amul butter", price: "₹120" },
+  { name: "Butter Cheese Pav Bhaji", detail: "Loaded with shredded Amul cheese", price: "₹150" },
+  { name: "Tawa Pulao", detail: "Basmati rice wok-tossed with pav bhaji masala", price: "₹130" },
+  { name: "Veg Hakka Noodles", detail: "Street-style wok-tossed noodles", price: "₹140" },
 ];

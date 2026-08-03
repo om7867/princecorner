@@ -2,12 +2,12 @@ import Image from "next/image";
 import { unsplash } from "@/lib/unsplash";
 
 const MARQUEE_IMAGES = [
-  { src: unsplash("1546069901-ba9599a7e63c", 800), alt: "Fresh vegetarian bowl" },
-  { src: unsplash("1512621776951-a57141f2eefd", 800), alt: "Gourmet salad" },
-  { src: unsplash("1631515243349-e0cb75fb8d3a", 800), alt: "Vegetarian Thali" },
-  { src: unsplash("1585937421612-70a008356fbe", 800), alt: "Paneer dish" },
-  { src: unsplash("1473093295043-cdd812d0e601", 800), alt: "Mushroom risotto" },
-  { src: unsplash("1565557623262-b51c2513a641", 800), alt: "Smoked paneer" },
+  { src: "/food-photos/paneer_butter_masala.jpg", alt: "Butter Paneer Masala" },
+  { src: "/food-photos/real_pav_bhaji.jpg", alt: "Prince Special Pav Bhaji" },
+  { src: "/food-photos/masala_dosa.jpg", alt: "Golden Masala Dosa" },
+  { src: "/food-photos/dal_makhani.jpg", alt: "Dal Makhani" },
+  { src: "/food-photos/punjabi_thali.jpg", alt: "Prince Punjabi Thali" },
+  { src: "/food-photos/hakka_noodles.jpg", alt: "Veg Hakka Noodles" },
 ];
 
 export function ImageMarquee() {
@@ -22,6 +22,7 @@ export function ImageMarquee() {
                 alt={img.alt}
                 fill
                 sizes="400px"
+                loading="eager"
                 className="object-cover"
               />
             </div>

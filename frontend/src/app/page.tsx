@@ -23,6 +23,7 @@ async function getMenuItems(): Promise<MenuItemDTO[]> {
   return MOCK_MENU_ITEMS;
 }
 
+import { FloatingCartPill } from "@/components/cart/FloatingCartPill";
 import { ImageMarquee } from "@/components/sections/ImageMarquee";
 
 export default async function Home() {
@@ -31,6 +32,7 @@ export default async function Home() {
     <>
       <LoadingScreen />
       <SideNav />
+      <FloatingCartPill />
       <SmoothScrollProvider>
         <main>
           <EditorialHero siteName={settings.name} />
@@ -42,8 +44,8 @@ export default async function Home() {
             tagline="Our Philosophy"
             heading="Elevated Vegetarian Heritage."
             paragraph="We believe that vegetarian dining is an art form. We take beloved classics and heritage recipes—from our signature street-food delicacies to rich, aromatic curries—and elevate them with premium ingredients and uncompromising attention to detail."
-            imageSrc="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2070&auto=format&fit=crop"
-            imageAlt="Gourmet vegetarian dish"
+            imageSrc="/food-photos/punjabi_thali.jpg"
+            imageAlt="Prince Special Punjabi Thali Feast"
             buttonText="Discover Our Story"
           />
 
@@ -53,9 +55,9 @@ export default async function Home() {
             layout="text-right"
             tagline="The Atmosphere"
             heading="A Space Designed for Senses."
-            paragraph="Step into an environment where architecture and ambiance converge. Warm lighting, tactile materials, and generous spatial design create a sanctuary for the modern epicurean."
-            imageSrc="https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format&fit=crop"
-            imageAlt="Restaurant Interior"
+            paragraph="Step into an environment where architecture and ambiance converge. Warm lighting, tactile materials, and generous spatial design create a sanctuary for family dining."
+            imageSrc="/food-photos/storefront_hero.jpg"
+            imageAlt="Prince Corner Dining Ambiance"
           />
 
           <VenueGrid hiddenPages={settings.hidden_pages} />
@@ -63,11 +65,11 @@ export default async function Home() {
           
           <EditorialSection 
             layout="split"
-            tagline="Private Dining"
+            tagline="Family Celebrations"
             heading="Intimate Gatherings. Unforgettable Moments."
-            paragraph="For those seeking a more exclusive experience, our private dining rooms offer secluded elegance accompanied by bespoke, multi-course vegetarian tasting menus crafted by our executive chef."
-            imageSrc="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070&auto=format&fit=crop"
-            imageAlt="Private Dining Room"
+            paragraph="For family gatherings and special occasions, our spacious dining areas offer comfortable seating accompanied by rich, authentic 100% pure vegetarian thalis and tawa specialties."
+            imageSrc="/food-photos/paneer_butter_masala.jpg"
+            imageAlt="Authentic Paneer Butter Masala"
           />
 
           <Testimonials />

@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { PUBLIC_API_BASE_URL } from "@/lib/env";
+import Link from "next/link";
 import { formatMoney } from "@/lib/types";
 import type { CategoryDTO, MenuItemDTO } from "@/lib/types";
 import { MOCK_CATEGORIES } from "@/data/mockMenu";
+import { useGlobalCart } from "@/hooks/useGlobalCart";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const DIETARY_LABEL: Record<string, string> = {
-  vegetarian: "Vegetarian",
+  vegetarian: "Pure Veg",
   vegan: "Vegan",
   "gluten-free": "Gluten-free",
   "contains-nuts": "Contains nuts",
@@ -19,55 +20,80 @@ const DIETARY_LABEL: Record<string, string> = {
 export function MenuShowcase({ items: allItems }: { items: MenuItemDTO[] }) {
   const [categories, setCategories] = useState<CategoryDTO[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const { addItem } = useGlobalCart();
 
   useEffect(() => {
-    // Backend is off; use mock categories directly to keep the terminal completely clean.
     setCategories(MOCK_CATEGORIES);
     setActiveCategoryId(MOCK_CATEGORIES[0]?.id ?? null);
   }, [allItems]);
 
   const activeItems = allItems.filter((item) => item.category_id === activeCategoryId);
-  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
-  
-  // The image to display: if hovering, show the hovered item's image. Otherwise, show the first item's image.
-  const displayItem = activeItems.find(i => i.id === hoveredItemId) || activeItems[0];
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    // Subtle fade in for the whole section (Desktop)
-    gsap.matchMedia().add("(min-width: 1024px)", () => {
-      gsap.fromTo(".menu-fade-up", 
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 1.5, stagger: 0.2, ease: "power3.out", scrollTrigger: { trigger: "#menu", start: "top 75%" } }
+    gsap.matchMedia().add("(min-width: 768px)", () => {
+      gsap.fromTo(
+        ".menu-fade-up",
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: { trigger: "#menu", start: "top 80%" },
+        }
       );
     });
   }, []);
 
-  return (
-    <section id="menu" aria-label="Menu" className="bg-linen py-24 sm:py-32 overflow-hidden">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="menu-fade-up mb-12 lg:mb-24 text-center lg:text-left">
-          <p className="font-body text-xs uppercase tracking-[0.35em] text-terracotta">
-            Our Menu
-          </p>
-          <h2 className="mt-4 font-display text-4xl italic text-espresso sm:text-6xl">
-            A curated tasting experience
-          </h2>
-        </div>
-      </div>
+  const scrollCarousel = (direction: "left" | "right") => {
+    if (!carouselRef.current) return;
+    const scrollAmount = direction === "left" ? -340 : 340;
+    carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  };
 
-      {/* MOBILE: Immersive Horizontal Snap Scrolling Feed */}
-      <div className="lg:hidden w-full relative">
-        {/* Category Pill Scroll */}
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-6 pb-6 no-scrollbar">
+  return (
+    <section id="menu" aria-label="Menu Showcase" className="bg-[#0e0b08] py-14 sm:py-28 overflow-hidden text-linen border-t border-white/10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        {/* Section Header */}
+        <div className="menu-fade-up mb-10 text-center lg:text-left flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-white/10 pb-8">
+          <div>
+            <p className="font-body text-xs uppercase tracking-[0.35em] text-saffron font-bold">
+              Signature Creations
+            </p>
+            <h2 className="mt-3 font-display text-3xl sm:text-6xl italic text-linen">
+              Taste The Prince Corner Specialties
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-linen/70 max-w-xl font-light">
+              Made fresh to order on live iron tawas & tandoors with 100% genuine Amul butter & pure spices.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4 self-center lg:self-auto">
+            <Link
+              href="/order?table=ONLINE&r=prince-corner-isanpur"
+              className="inline-flex items-center gap-2 rounded-full bg-saffron px-6 py-3 font-body text-xs uppercase tracking-widest font-bold text-espresso shadow-[0_0_20px_rgba(231,167,58,0.3)] transition-transform hover:scale-105 active:scale-95"
+            >
+              <span>Order Full Menu Online</span>
+              <span>➔</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Category Pill Tabs */}
+        <div className="menu-fade-up flex overflow-x-auto gap-2 sm:gap-3 pb-4 mb-6 sm:mb-8 no-scrollbar -mx-1 px-1">
           {categories.map((cat) => {
             const isActive = cat.id === activeCategoryId;
             return (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategoryId(cat.id)}
-                className={`snap-start shrink-0 rounded-full px-6 py-3 text-sm font-semibold tracking-wider uppercase transition-all duration-300 ${
-                  isActive ? "bg-espresso text-linen shadow-lg" : "bg-espresso/5 text-espresso/60 border border-espresso/10"
+                className={`shrink-0 font-body text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] px-4 sm:px-5 py-2.5 sm:py-3 rounded-full transition-all duration-300 ${
+                  isActive
+                    ? "bg-saffron text-espresso shadow-[0_0_18px_rgba(231,167,58,0.35)] scale-105"
+                    : "bg-white/5 text-linen/70 hover:text-linen hover:bg-white/10 border border-white/10"
                 }`}
               >
                 {cat.name}
@@ -76,140 +102,152 @@ export function MenuShowcase({ items: allItems }: { items: MenuItemDTO[] }) {
           })}
         </div>
 
-        {/* Readable Vertical Menu with Inline Image Reveal */}
-        <div className="flex flex-col gap-6 px-6 pb-12">
-          {activeItems.map((item) => {
-            const isExpanded = hoveredItemId === item.id;
-            return (
-              <div 
-                key={item.id} 
-                onClick={() => setHoveredItemId(isExpanded ? null : item.id)}
-                className="flex flex-col gap-4 border-b border-espresso/10 pb-6 transition-all duration-300"
-              >
-                {/* The readable text row */}
-                <div className="flex justify-between items-baseline gap-4 cursor-pointer">
-                  <h3 className="font-display text-2xl text-espresso">
-                    {item.name}
-                  </h3>
-                  <span className="font-body text-base font-bold tracking-widest text-terracotta whitespace-nowrap">
-                    {formatMoney(item.base_price)}
-                  </span>
-                </div>
-                
-                <p className="text-sm leading-relaxed text-espresso/70 pr-4">
-                  {item.description}
-                </p>
+        {/* Dish Carousel Controls Bar */}
+        <div className="menu-fade-up flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 text-xs text-saffron uppercase font-bold tracking-widest">
+            <span className="w-2 h-2 rounded-full bg-saffron animate-pulse" />
+            <span>Showing {activeItems.length} Signature Specialties</span>
+          </div>
 
-                {item.dietary_tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {item.dietary_tags.map((tag) => (
-                      <span key={tag} className="text-[10px] font-bold uppercase tracking-[0.2em] text-espresso/50 border border-espresso/10 rounded-full px-2 py-0.5">
-                        {DIETARY_LABEL[tag]}
-                      </span>
-                    ))}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => scrollCarousel("left")}
+              aria-label="Previous dishes"
+              className="w-10 h-10 rounded-full border border-white/15 bg-white/5 hover:bg-saffron hover:text-espresso hover:border-saffron flex items-center justify-center text-linen transition-all duration-300 active:scale-95"
+            >
+              ◀
+            </button>
+            <button
+              onClick={() => scrollCarousel("right")}
+              aria-label="Next dishes"
+              className="w-10 h-10 rounded-full border border-white/15 bg-white/5 hover:bg-saffron hover:text-espresso hover:border-saffron flex items-center justify-center text-linen transition-all duration-300 active:scale-95"
+            >
+              ▶
+            </button>
+          </div>
+        </div>
+
+        {/* DISH CAROUSEL SLIDER */}
+        <div
+          ref={carouselRef}
+          className="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-6 sm:pb-8 pt-2 no-scrollbar scroll-smooth -mx-1 px-1"
+        >
+          {activeItems.map((item) => (
+            <div
+              key={item.id}
+              className="menu-fade-up snap-start shrink-0 w-[260px] sm:w-[340px] rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-[#14100b] overflow-hidden shadow-xl transition-all duration-500 hover:border-saffron/50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.8)] group flex flex-col justify-between"
+            >
+              {/* Dish Photo Header */}
+              <div className="relative h-40 sm:h-56 w-full overflow-hidden bg-black/40">
+                {item.photo_url ? (
+                  <Image
+                    src={item.photo_url}
+                    alt={item.photo_alt || item.name}
+                    fill
+                    sizes="340px"
+                    className="object-cover transition-transform duration-700 ease-[var(--ease-cubic)] group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-white/5">
+                    <span className="font-display italic text-linen/40 text-sm">Prince Corner Signature</span>
                   </div>
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#14100b] via-transparent to-transparent opacity-80" />
 
-                {/* Unique Mobile Inline Image Expansion */}
-                <div 
-                  className={`relative w-full rounded-2xl overflow-hidden transition-all duration-700 ease-[var(--ease-cubic)] ${
-                    isExpanded ? "h-[40vh] mt-4 opacity-100" : "h-0 mt-0 opacity-0"
-                  }`}
-                >
-                  {item.photo_url ? (
-                    <Image
-                      src={item.photo_url}
-                      alt={item.photo_alt || item.name}
-                      fill
-                      sizes="90vw"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-charcoal flex items-center justify-center">
-                      <span className="text-linen/50 italic font-display">Signature</span>
-                    </div>
-                  )}
+                {/* Price Tag Badge */}
+                <div className="absolute top-4 right-4 bg-[#0e0b08]/85 border border-white/20 backdrop-blur-md rounded-full px-3 py-1 font-body text-xs font-bold text-saffron shadow-lg">
+                  {formatMoney(item.base_price)}
+                </div>
+
+                {/* Pure Veg Badge */}
+                {item.dietary_tags.length > 0 && (
+                  <div className="absolute top-4 left-4 bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 backdrop-blur-md rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                    {DIETARY_LABEL[item.dietary_tags[0]] || "Pure Veg"}
+                  </div>
+                )}
+              </div>
+
+              {/* Dish Info & Description */}
+              <div className="p-4 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-display text-xl sm:text-2xl italic text-linen group-hover:text-saffron transition-colors duration-300">
+                    {item.name}
+                  </h3>
+                  <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs text-linen/70 font-light leading-relaxed line-clamp-2 sm:line-clamp-3">
+                    {item.description}
+                  </p>
+                </div>
+
+                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/10 flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-linen/50">
+                    Fresh Live Preparation
+                  </span>
+                  <button
+                    onClick={() => addItem(item)}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-saffron/15 hover:bg-saffron active:bg-saffron border border-saffron/40 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-saffron hover:text-espresso active:text-espresso active:scale-95 transition-all duration-200 shadow-sm"
+                  >
+                    <span>+ Add</span>
+                  </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* DESKTOP: Split-Screen Hover Experience */}
-      <div className="hidden lg:grid max-w-7xl mx-auto px-6 lg:grid-cols-2 gap-24 items-start">
-        {/* LEFT: Sticky Image Display */}
-        <div className="menu-fade-up sticky top-32 h-[75vh] w-full rounded-3xl overflow-hidden shadow-2xl">
-          <div className="relative w-full h-full">
-            {displayItem?.photo_url ? (
-              <Image
-                src={displayItem.photo_url}
-                alt={displayItem.photo_alt || displayItem.name}
-                fill
-                sizes="50vw"
-                className="object-cover transition-opacity duration-700 ease-[var(--ease-cubic)]"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full bg-espresso/5 flex items-center justify-center">
-                <span className="font-display italic text-espresso/40 text-2xl">Signature Dish</span>
-              </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-espresso/40 to-transparent pointer-events-none" />
-          </div>
+            </div>
+          ))}
         </div>
 
-        {/* RIGHT: Menu Categories & Items */}
-        <div className="flex flex-col">
-          {/* Category Tabs */}
-          <div className="menu-fade-up flex flex-wrap gap-6 border-b border-espresso/10 pb-6 mb-12">
-            {categories.map((cat) => {
-              const isActive = cat.id === activeCategoryId;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategoryId(cat.id)}
-                  className={`font-body text-sm uppercase tracking-[0.2em] transition-all duration-500 ease-out ${
-                    isActive ? "text-espresso font-semibold" : "text-espresso/40 hover:text-espresso/70"
-                  }`}
-                >
-                  {cat.name}
-                  {isActive && <div className="mt-2 h-0.5 w-full bg-terracotta" />}
-                </button>
-              );
-            })}
+        {/* LINE-WISE FULL MENU CATEGORICAL LISTING */}
+        <div className="mt-16 pt-12 border-t border-white/10">
+          <div className="menu-fade-up mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="font-body text-xs uppercase tracking-[0.3em] text-saffron font-bold">
+                Line-Wise Menu View
+              </p>
+              <h3 className="font-display text-2xl sm:text-3xl italic text-linen">
+                All Dishes Listed Line by Line
+              </h3>
+            </div>
+
+            <Link
+              href="/order?table=ONLINE&r=prince-corner-isanpur"
+              className="text-xs font-bold uppercase tracking-widest text-saffron hover:underline"
+            >
+              Open Digital Ordering Screen ➔
+            </Link>
           </div>
 
-          {/* Menu List */}
-          <div className="flex flex-col gap-10">
+          {/* Line-Wise Grid */}
+          <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
             {activeItems.map((item) => (
-              <div 
-                key={item.id}
-                onMouseEnter={() => setHoveredItemId(item.id)}
-                onMouseLeave={() => setHoveredItemId(null)}
-                className="group cursor-pointer menu-fade-up"
+              <div
+                key={`line-${item.id}`}
+                className="menu-fade-up group flex items-start justify-between gap-4 p-4 rounded-xl border border-white/5 bg-[#14100b]/40 hover:bg-[#14100b] hover:border-saffron/30 transition-all duration-300"
               >
-                <div className="flex items-baseline justify-between gap-4 border-b border-transparent transition-colors duration-500 group-hover:border-espresso/20 pb-4">
-                  <h3 className="font-display text-2xl text-espresso transition-transform duration-500 group-hover:translate-x-2">
-                    {item.name}
-                  </h3>
-                  <span className="font-body text-sm font-semibold tracking-widest text-terracotta">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-display text-xl text-linen group-hover:text-saffron transition-colors">
+                      {item.name}
+                    </h4>
+                    <span className="text-[9px] text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold uppercase">
+                      Pure Veg
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-linen/60 font-light line-clamp-2">
+                    {item.description}
+                  </p>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <span className="font-body text-base font-bold text-saffron">
                     {formatMoney(item.base_price)}
                   </span>
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-espresso/70 transition-transform duration-500 group-hover:translate-x-2">
-                  {item.description}
-                </p>
-
-                {item.dietary_tags.length > 0 && (
-                  <div className="mt-4 flex gap-3 transition-transform duration-500 group-hover:translate-x-2">
-                    {item.dietary_tags.map((tag) => (
-                      <span key={tag} className="text-[10px] uppercase tracking-[0.1em] text-espresso/50 border border-espresso/10 rounded-full px-2 py-0.5">
-                        {DIETARY_LABEL[tag]}
-                      </span>
-                    ))}
+                  <div className="mt-1">
+                    <button
+                      onClick={() => addItem(item)}
+                      className="rounded-full bg-saffron/15 hover:bg-saffron border border-saffron/40 px-3 py-1 text-[10px] uppercase font-bold text-saffron hover:text-espresso transition-colors"
+                    >
+                      + Add
+                    </button>
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>
@@ -218,3 +256,4 @@ export function MenuShowcase({ items: allItems }: { items: MenuItemDTO[] }) {
     </section>
   );
 }
+

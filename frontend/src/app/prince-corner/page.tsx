@@ -8,6 +8,8 @@ import { PrinceBranchWheel } from "./PrinceBranchWheel";
 import { DotNavigation } from "@/components/ui/DotNavigation";
 import Link from "next/link";
 
+import { PageUnavailable } from "@/components/ui/PageUnavailable";
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Prince Corner — Isanpurwala",
@@ -28,6 +30,10 @@ export const dynamic = "force-dynamic";
 export default async function PrinceCornerPage() {
   const settings = await getSiteSettings();
   
+  if (settings.hidden_pages.includes("prince-corner")) {
+    return <PageUnavailable siteName={settings.name} />;
+  }
+
   const sections = [
     { id: "hero", label: "The Legacy" },
     { id: "menu", label: "Menu" },

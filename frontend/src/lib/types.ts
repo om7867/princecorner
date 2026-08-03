@@ -127,6 +127,7 @@ export type SiteSettingsDTO = {
 
 /** The public-site destinations an owner can toggle live/unlive from Admin > Pages. */
 export const TOGGLEABLE_PAGES = [
+  { slug: "prince-corner", label: "Prince's Corner", href: "/prince-corner" },
   { slug: "restaurant", label: "Restaurant", href: "/restaurant" },
   { slug: "cafe", label: "Café", href: "/cafe" },
   { slug: "bar", label: "Bar", href: "/bar" },

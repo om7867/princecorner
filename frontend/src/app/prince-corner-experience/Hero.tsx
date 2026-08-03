@@ -64,7 +64,7 @@ export function Hero() {
 
       <div className="relative z-10 flex w-24 flex-col items-center">
         <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-[#D4AF37]/40 shadow-[0_0_40px_rgba(212,175,55,0.25)]">
-          <Image src="/princelogo.png" alt="Prince Corner" fill className="object-cover" priority />
+          <Image src="/princelogo.png" alt="Prince Corner" fill sizes="96px" className="object-cover" priority />
         </div>
       </div>
 

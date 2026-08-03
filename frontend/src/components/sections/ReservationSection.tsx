@@ -67,8 +67,8 @@ export function ReservationSection() {
     >
       <div aria-hidden className="absolute inset-0">
         <Image
-          src={unsplash("1414235077428-338989a2e8c0", 1600)}
-          alt=""
+          src="/food-photos/storefront_hero.jpg"
+          alt="Prince Corner Storefront"
           fill
           sizes="100vw"
           className="object-cover"

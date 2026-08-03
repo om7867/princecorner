@@ -10,7 +10,7 @@ export function FloatingContact() {
   if (!settings) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3">
+    <div className="fixed bottom-24 sm:bottom-5 right-4 sm:right-5 z-40 flex flex-col items-end gap-3">
       <QRScannerButton />
       <a
         href={whatsappLink(settings)}

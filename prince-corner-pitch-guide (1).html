@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prince Corner — Sales Pitch Playbook</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0a;
+    color: #e8e6e1;
+    line-height: 1.7;
+    padding: 0;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #1a0a00 0%, #2d1200 40%, #0a0a0a 100%);
+    padding: 60px 32px 48px;
+    border-bottom: 1px solid #2a1a0a;
+  }
+  .hero-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .badge {
+    display: inline-block;
+    background: #e6530020;
+    color: #ff7a3d;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 4px;
+    border: 1px solid #e6530030;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .hero h1 span { color: #ff7a3d; }
+  .hero p.sub {
+    font-size: 16px;
+    color: #999;
+    max-width: 600px;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* Section */
+  .section {
+    padding: 48px 0 40px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ff7a3d;
+    margin-bottom: 16px;
+  }
+  .section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  /* Branch table */
+  .branch-grid {
+    display: grid;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .branch-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 100px 100px 100px;
+    align-items: center;
+    background: #111;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 14px;
+    border: 1px solid #1a1a1a;
+  }
+  .branch-row.header {
+    background: #0a0a0a;
+    font-weight: 700;
+    color: #666;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    padding: 8px 18px;
+  }
+  .branch-num {
+    color: #ff7a3d;
+    font-weight: 700;
+  }
+  .branch-name { color: #e8e6e1; font-weight: 500; }
+  .branch-rating { color: #fbbf24; font-weight: 600; text-align: center; }
+  .branch-area { color: #999; text-align: center; font-size: 13px; }
+  .branch-type { text-align: center; }
+  .tag-main {
+    background: #ff7a3d20;
+    color: #ff7a3d;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+  .tag-branch {
+    background: #ffffff10;
+    color: #888;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .card {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 22px;
+  }
+  .card-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  .card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .card p {
+    font-size: 13px;
+    color: #888;
+    line-height: 1.6;
+  }
+
+  /* Step blocks */
+  .step-block {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 14px;
+    position: relative;
+    border-left: 3px solid #ff7a3d;
+  }
+  .step-num {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    font-size: 42px;
+    font-weight: 800;
+    color: #ffffff08;
+  }
+  .step-block h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .step-block p {
+    font-size: 14px;
+    color: #999;
+    line-height: 1.7;
+  }
+
+  /* Objection blocks */
+  .objection {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 14px;
+  }
+  .obj-q {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ff5252;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .obj-q::before {
+    content: "🗣️";
+    flex-shrink: 0;
+  }
+  .obj-a {
+    font-size: 14px;
+    color: #88cc88;
+    line-height: 1.7;
+    padding-left: 30px;
+  }
+  .obj-a::before {
+    content: "✅ Your reply: ";
+    font-weight: 700;
+    color: #66bb6a;
+  }
+
+  /* Script */
+  .script-box {
+    background: #0d1117;
+    border: 1px solid #1e3a2a;
+    border-radius: 10px;
+    padding: 24px;
+    margin: 14px 0;
+  }
+  .script-box .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #66bb6a;
+    margin-bottom: 12px;
+  }
+  .script-box p {
+    font-size: 14px;
+    color: #b0c4b8;
+    line-height: 1.8;
+    font-style: italic;
+  }
+  .script-box p strong {
+    color: #e8e6e1;
+    font-style: normal;
+  }
+
+  /* Stat highlight */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .stat-box {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-box .num {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ff7a3d;
+  }
+  .stat-box .desc {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  /* Pricing */
+  .pricing-table {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  .pricing-row {
+    display: grid;
+    grid-template-columns: 1fr 140px 200px;
+    padding: 16px 22px;
+    align-items: center;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .pricing-row:last-child { border-bottom: none; }
+  .pricing-row.p-header {
+    background: #0a0a0a;
+    font-size: 11px;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 22px;
+  }
+  .pricing-row .feat { font-size: 14px; color: #e8e6e1; }
+  .pricing-row .price { font-size: 14px; color: #ff7a3d; font-weight: 700; text-align: center; }
+  .pricing-row .note { font-size: 12px; color: #666; text-align: right; }
+
+  /* CTA */
+  .cta-section {
+    background: linear-gradient(135deg, #2d1200 0%, #1a0a00 100%);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    margin: 40px 0 60px;
+    border: 1px solid #3d2200;
+  }
+  .cta-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .cta-section p {
+    font-size: 14px;
+    color: #999;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .hero h1 { font-size: 26px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: 1fr; }
+    .branch-row { grid-template-columns: 30px 1fr 60px 70px; font-size: 12px; }
+    .branch-area { display: none; }
+    .pricing-row { grid-template-columns: 1fr 100px; }
+    .pricing-row .note { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="badge">Sales Pitch Playbook</div>
+    <h1>Selling Your Restaurant ERP to <span>Prince Corner</span></h1>
+    <p class="sub">Complete research, approach strategy, objection handling, and pricing guide — everything you need before the meeting.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SECTION 1: RESEARCH -->
+  <div class="section">
+    <div class="section-label">Research Intel</div>
+    <h2>Prince Corner — Business Profile</h2>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="num">11</div>
+        <div class="desc">Outlets in Ahmedabad<br>(Zomato verified)</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">6+</div>
+        <div class="desc">Confirmed Branch Areas<br>(from their own Instagram)</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">₹250–400</div>
+        <div class="desc">Average cost for two<br>(mid-range street food)</div>
+      </div>
+    </div>
+
+    <p style="font-size:14px; color:#999; margin-bottom:20px;">Their Instagram bio (@prince_corner_) lists branches in: <strong style="color:#e8e6e1">Isanpur (HQ), Maninagar, Jodhpur, Vaishnodevi, Mansi Circle, and Bopal</strong>. Zomato also shows outlets in Satellite, Vastrapur, Gota, and Nikol — totalling 11 outlets.</p>
+
+    <div class="branch-grid">
+      <div class="branch-row header">
+        <div>#</div>
+        <div>Branch Location</div>
+        <div>Rating</div>
+        <div>Area Type</div>
+        <div>Status</div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">1</div>
+        <div class="branch-name">Isanpur (I G P House, Vatva Road)</div>
+        <div class="branch-rating">4.0 ★</div>
+        <div class="branch-area">South</div>
+        <div class="branch-type"><span class="tag-main">MAIN HQ</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">2</div>
+        <div class="branch-name">Jodhpur / Bileshwar Mahadev Mandir Rd</div>
+        <div class="branch-rating">3.9 ★</div>
+        <div class="branch-area">West</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">3</div>
+        <div class="branch-name">Nikolgram Road</div>
+        <div class="branch-rating">4.1 ★</div>
+        <div class="branch-area">South</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">4</div>
+        <div class="branch-name">Satellite (Opp Jodhpur Gam)</div>
+        <div class="branch-rating">—</div>
+        <div class="branch-area">West</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">5</div>
+        <div class="branch-name">Vastrapur (Mansi Circle)</div>
+        <div class="branch-rating">2.7</div>
+        <div class="branch-area">West</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">6</div>
+        <div class="branch-name">Bopal (South Bopal)</div>
+        <div class="branch-rating">3.4 ★</div>
+        <div class="branch-area">South-West</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">7</div>
+        <div class="branch-name">Bopal (2nd outlet)</div>
+        <div class="branch-rating">—</div>
+        <div class="branch-area">South-West</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">8</div>
+        <div class="branch-name">Maninagar</div>
+        <div class="branch-rating">—</div>
+        <div class="branch-area">South</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">9</div>
+        <div class="branch-name">Vaishnodevi Circle / Gota</div>
+        <div class="branch-rating">—</div>
+        <div class="branch-area">North</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">10</div>
+        <div class="branch-name">Nikol</div>
+        <div class="branch-rating">—</div>
+        <div class="branch-area">East</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-num">11</div>
+        <div class="branch-name">Isanpur (2nd outlet — "Isanpurwala")</div>
+        <div class="branch-rating">—</div>
+        <div class="branch-area">South</div>
+        <div class="branch-type"><span class="tag-branch">Branch</span></div>
+      </div>
+    </div>
+
+    <p style="font-size:13px; color:#666; margin-top:12px;"><strong style="color:#999;">Key insight:</strong> Isanpur is the original/flagship with highest loyalty. Vastrapur (2.7) has bad reviews — food quality complaints and Zomato delivery issues. West-side branches (Satellite, Jodhpur) serve wealthier, tech-savvy clientele. The Bopal branch review explicitly mentions "no air conditioning" and crowding — pain points your system helps with.</p>
+  </div>
+
+  <!-- SECTION 2: THEIR PAIN POINTS -->
+  <div class="section">
+    <div class="section-label">Their Problems (You Solve These)</div>
+    <h2>Why Prince Corner Needs Your System — Even If They Don't Know It Yet</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>No Centralized Control Over 11 Outlets</h3>
+        <p>The owner sits at Isanpur but has zero real-time visibility into what's selling at Gota vs Bopal vs Satellite. Which branch is underperforming? Which items are wasted? He's running blind across 11 locations.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⭐</div>
+        <h3>Inconsistent Quality Across Branches</h3>
+        <p>Isanpur has 4.0 rating but Vastrapur has 2.7 with complaints about food quality. Without centralized menu + inventory control, each branch does its own thing. Reviews mention "not fresh" food at some outlets.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🕐</div>
+        <h3>Crowding & Wait Times = Lost Customers</h3>
+        <p>Bopal branch reviews say "crowded most of the times, you have to wait." QR table ordering eliminates the waiter bottleneck — customers order the second they sit down.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💸</div>
+        <h3>Paying 25-30% Commission to Zomato/Swiggy</h3>
+        <p>On every online order, Zomato/Swiggy takes 25-30% cut. On ₹400 average order, that's ₹100-120 gone per order. His own website with ordering = 0% commission on direct orders.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚫</div>
+        <h3>No Customer Data Ownership</h3>
+        <p>Zomato owns the customer. Prince Corner has zero data — no phone numbers, no order history, no repeat customer identification. He can't run his own promotions or loyalty programs.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h3>No Online Presence Beyond Aggregators</h3>
+        <p>Prince Corner has only an Instagram (368 followers) and third-party listings. No website, no direct ordering. They're 100% dependent on platforms they don't control.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: APPROACH STRATEGY -->
+  <div class="section">
+    <div class="section-label">Approach Strategy</div>
+    <h2>How to Approach Him — Step by Step</h2>
+
+    <div class="step-block">
+      <div class="step-num">01</div>
+      <h3>Don't "Sell" — Start as a Conversation Through Your Dad</h3>
+      <p>Have your dad casually bring it up: <em>"My son has built something for restaurants, he wanted your opinion on it as someone who runs 11 branches. Can he show you for 10 minutes?"</em> This frames you as someone seeking guidance, not selling. Restaurant owners respect that. Ask your dad to set up a chai meeting at the Isanpur branch — his home turf where he's comfortable.</p>
+    </div>
+
+    <div class="step-block">
+      <div class="step-num">02</div>
+      <h3>Go at the Right Time</h3>
+      <p>Visit between <strong>3:00 PM – 5:00 PM</strong> (after lunch rush, before dinner). Never during peak hours. Weekdays are better — Tuesday/Wednesday/Thursday. The owner will be relaxed and have bandwidth to listen. Dress sharp-casual, carry a tablet or laptop with your demo ready.</p>
+    </div>
+
+    <div class="step-block">
+      <div class="step-num">03</div>
+      <h3>Open With Praise + A Problem He Recognizes</h3>
+      <p>Start by genuinely appreciating what he's built — 11 outlets from an Isanpur street food corner is impressive. Then ask a question he can't dodge: <em>"Uncle, with 11 branches, how do you track what's selling at each outlet daily? Do you get reports on your phone?"</em> — He'll admit he doesn't have real-time data. That's your opening.</p>
+    </div>
+
+    <div class="step-block">
+      <div class="step-num">04</div>
+      <h3>Show the Demo on His Own Table</h3>
+      <p>Literally scan a QR code on the table you're sitting at. Show how a customer would see the Prince Corner menu, customize an order, and place it — no waiter needed. Show him the admin panel with live orders, branch-wise sales, and the super-admin dashboard. Make it about HIS brand, not your software.</p>
+    </div>
+
+    <div class="step-block">
+      <div class="step-num">05</div>
+      <h3>Hit the Money Argument</h3>
+      <p>Do quick math together: <em>"If even 50 orders a day come directly through your website instead of Zomato, at ₹400 average, that's ₹20,000/day × 30 days = ₹6 lakh/month. Zomato takes 25% = ₹1.5 lakh saved per month. My entire system costs less than what you pay Zomato in one week."</em></p>
+    </div>
+
+    <div class="step-block">
+      <div class="step-num">06</div>
+      <h3>Offer a Zero-Risk Pilot</h3>
+      <p>Propose: <em>"Let's try it at just one branch — Isanpur — for 1 month. I'll set everything up. If it doesn't work, you owe nothing. If you see value, we roll it to other branches."</em> Zero risk = no reason to say no.</p>
+    </div>
+  </div>
+
+  <!-- SECTION 4: THE OPENING SCRIPT -->
+  <div class="section">
+    <div class="section-label">What to Say</div>
+    <h2>Opening Script (Rehearse This)</h2>
+
+    <div class="script-box">
+      <div class="label">Opening (30 seconds)</div>
+      <p><strong>"Uncle, namaste. Papa has told me so much about how you built Prince Corner from Isanpur to 11 branches across Ahmedabad — that's incredible. I'm working in tech, and I've been building something specifically for multi-branch restaurants like yours. I just wanted your honest feedback on it — it'll take 5 minutes. Can I show you?"</strong></p>
+    </div>
+
+    <div class="script-box">
+      <div class="label">The Pain Question (creates the need)</div>
+      <p><strong>"Quick question — right now, how do you know what's happening at your Gota branch or Nikol branch while you're sitting here in Isanpur? Like, what sold today, what's running low, how many orders came in? Do you get that on your phone?"</strong></p>
+    </div>
+
+    <div class="script-box">
+      <div class="label">The Demo Hook (after he says he doesn't have real-time data)</div>
+      <p><strong>"That's exactly what I built. Look — (opens laptop/phone) — this is how it would look for Prince Corner. You see all 11 branches here. Live orders coming in. Branch-wise daily sales. Which items are selling most at which branch. And here's the best part — (shows QR) — your customer scans this at the table, orders directly, no waiter needed. Kitchen gets the order instantly."</strong></p>
+    </div>
+
+    <div class="script-box">
+      <div class="label">The Money Punch (after demo)</div>
+      <p><strong>"And uncle, one more thing. Right now Zomato and Swiggy take 25-30% commission on every order. On ₹400 order, that's ₹100-120 gone. With your own website and app, customers order directly from you — you keep 100%. Even 50 direct orders a day saves ₹1.5 lakh per month across branches. This system pays for itself in the first week."</strong></p>
+    </div>
+  </div>
+
+  <!-- SECTION 5: OBJECTION HANDLING -->
+  <div class="section">
+    <div class="section-label">Objection Handling</div>
+    <h2>Every "No" He'll Say — And Your Reply</h2>
+
+    <div class="objection">
+      <div class="obj-q">"Zomato aur Swiggy hai na, website ki kya zarurat?"</div>
+      <div class="obj-a"><strong>Zomato is a discovery platform, not YOUR platform.</strong> Zomato owns the customer — you don't even get their phone number. They can increase commission anytime (they already went from 18% to 25-28%). And when a customer searches "pav bhaji near me" on Zomato, they also see your competitors. On YOUR website, it's only Prince Corner. Plus, every repeat customer who orders directly saves you ₹100+ per order. You're not removing Zomato — you're adding a channel where YOU keep 100% of the money.</div>
+    </div>
+
+    <div class="objection">
+      <div class="obj-q">"QR se order kaun karega? Log waiter ko bulate hai"</div>
+      <div class="obj-a">Café Coffee Day, McDonald's, Domino's, KFC — sab QR use kar rahe hain. Young customers (18-30) actually PREFER scanning and ordering themselves. They don't want to wait for a waiter, don't want to repeat the order twice. And for YOU — it means fewer waiters needed, fewer wrong orders, faster table turnover. One waiter handles 10 tables instead of 5. Your Bopal branch reviews say "always crowded, have to wait" — QR ordering fixes that instantly.</div>
+    </div>
+
+    <div class="objection">
+      <div class="obj-q">"Mere staff ko technology nahi aati"</div>
+      <div class="obj-a">The system is designed for that. Kitchen staff just see orders appearing on a screen — like WhatsApp messages. No typing, no learning. I'll personally train your staff at each branch. And the admin panel is in simple Gujarati/Hindi-friendly language. Even your Isanpur counter boy can use it — I'll make sure of it.</div>
+    </div>
+
+    <div class="objection">
+      <div class="obj-q">"Kitna kharcha aayega? Bahut mehnga hoga"</div>
+      <div class="obj-a">The QR ordering system costs about ₹2,000-3,000 per month per branch — that's less than one day's Zomato commission. The website costs a one-time setup fee. And I'm offering the first month completely free as a trial at Isanpur. If it doesn't add value, you stop — zero loss. But I'm confident that in one month, you'll want it at all 11 branches.</div>
+    </div>
+
+    <div class="objection">
+      <div class="obj-q">"Abhi chal raha hai, change ki kya zarurat?"</div>
+      <div class="obj-a">Everything was "chal raha hai" before Zomato too — people still ordered on phone. But restaurants that got on Zomato early got the advantage. Similarly, restaurants that set up their own direct ordering NOW will save lakhs when commission rates increase further. Your competitors are already doing this. Barbeque Nation, Honest Restaurant — all have their own ordering. At 11 branches, you're big enough to deserve your own system.</div>
+    </div>
+
+    <div class="objection">
+      <div class="obj-q">"Mujhe sochne do / I'll think about it"</div>
+      <div class="obj-a">Don't push. Say: <strong>"Bilkul uncle, take your time. Main ek kaam karta hoon — aapke Isanpur branch ka demo ready karke rakh deta hoon, Prince Corner ke menu ke saath. Jab bhi 15 minute mile, I'll show you on your own phone how it looks. No commitment."</strong> Then follow up after 3-4 days via your dad, not directly. Keep it warm, not pushy.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: PRICING STRATEGY -->
+  <div class="section">
+    <div class="section-label">Pricing Strategy</div>
+    <h2>How to Package & Price It</h2>
+
+    <div class="pricing-table">
+      <div class="pricing-row p-header">
+        <div>Feature</div>
+        <div>Pricing Model</div>
+        <div>Your Pitch</div>
+      </div>
+      <div class="pricing-row">
+        <div class="feat">QR Table Ordering System</div>
+        <div class="price">₹2,000–3,000/mo per branch</div>
+        <div class="note">Subscription — recurring revenue for you</div>
+      </div>
+      <div class="pricing-row">
+        <div class="feat">Website + Online Ordering</div>
+        <div class="price">₹15,000–25,000 one-time</div>
+        <div class="note">One-time setup + ₹1,500/mo hosting</div>
+      </div>
+      <div class="pricing-row">
+        <div class="feat">Super Admin Dashboard (all branches)</div>
+        <div class="price">₹5,000/mo</div>
+        <div class="note">The real value — bundle with QR</div>
+      </div>
+      <div class="pricing-row">
+        <div class="feat">Free Trial — 1 Branch, 1 Month</div>
+        <div class="price">₹0</div>
+        <div class="note">Your foot in the door — critical</div>
+      </div>
+    </div>
+
+    <p style="font-size:14px; color:#999; margin-top:14px;"><strong style="color:#ff7a3d;">Smart bundling:</strong> Don't quote each feature separately in the first meeting. Say: <em>"For all 11 branches — QR ordering, super admin dashboard, and your own website — it would be around ₹20,000-25,000 per month total. That's ₹2,000 per branch. You save more than that in one day of Zomato commissions."</em></p>
+  </div>
+
+  <!-- SECTION 7: PREPARATION CHECKLIST -->
+  <div class="section">
+    <div class="section-label">Before the Meeting</div>
+    <h2>Your Preparation Checklist</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <h3>Customize the Demo</h3>
+        <p>Put Prince Corner's actual menu in your demo — Butter Bhaji Pav, Pizza Dosa, Mysore Masala Dosa, Chinese Bhel, Manchurian Noodles. Use their logo and orange brand color. When he sees HIS brand in the system, it becomes real.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h3>Print 2-3 QR Codes</h3>
+        <p>Laminate them. Place one on the table when you sit down. The physical QR code makes it tangible — he can hold it, flip it, imagine it on his tables. Show, don't just tell.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📄</div>
+        <h3>One-Page Summary</h3>
+        <p>Print a clean one-pager: What it does, 3 benefits, pricing, your contact. Leave it with him. He'll look at it later and show his family/partner. Keep it Gujarati-friendly if possible.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔢</div>
+        <h3>ROI Calculation Sheet</h3>
+        <p>Pre-calculate the Zomato commission savings math for Prince Corner specifically. Show: current commission loss vs. direct ordering savings. Concrete numbers beat vague promises every time.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 8: FINAL TIPS -->
+  <div class="section">
+    <div class="section-label">Mindset</div>
+    <h2>Final Tips That Matter</h2>
+
+    <div class="step-block" style="border-left-color: #fbbf24;">
+      <h3>Speak Gujarati / Hindi — Not Tech English</h3>
+      <p>Don't say "ERP", "SaaS", "subscription model", "dashboard". Say "sabhi branch ka hisaab ek jagah", "mahine ka plan", "phone pe live dekhna". Match his language, not yours.</p>
+    </div>
+
+    <div class="step-block" style="border-left-color: #fbbf24;">
+      <h3>Respect That He Built This Without Tech</h3>
+      <p>He grew from 1 to 11 branches without any software. Don't imply he's behind the times. Frame it as: "You've built something amazing. This technology will help you scale it to 20-25 branches without the headaches doubling."</p>
+    </div>
+
+    <div class="step-block" style="border-left-color: #fbbf24;">
+      <h3>First Meeting Goal: Not a Sale — A Second Meeting</h3>
+      <p>Your ONLY goal in the first meeting is to get him to say "Interesting, show me more" or "Set it up at one branch and let me try." Don't try to close the deal on day one. Plant the seed, let it grow.</p>
+    </div>
+
+    <div class="step-block" style="border-left-color: #fbbf24;">
+      <h3>Follow Up Through Your Dad, Not Cold Calls</h3>
+      <p>The relationship channel (your dad's friendship) is your biggest advantage. After the meeting, let your dad casually mention it: "Mera beta bol raha tha aapko uss system mein interest tha?" This keeps it warm without being pushy.</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2>You've Got This 💪</h2>
+    <p>You have the research, the script, the objection handling, and the pricing. Now customize your demo with Prince Corner's menu, practice the script 3 times out loud, and book the meeting. The product sells itself — you just need to get it in front of him.</p>
+  </div>
+
+</div>
+
+</body>
+</html>

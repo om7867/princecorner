@@ -20,12 +20,12 @@ export function useSiteSettings(restaurantSlug?: string): { settings: SiteSettin
       ? `${PUBLIC_API_BASE_URL}/settings?restaurant=${encodeURIComponent(restaurantSlug)}`
       : `${PUBLIC_API_BASE_URL}/settings`;
     fetch(url)
-      .then((r) => r.json())
-      .then((data: SiteSettingsDTO) => {
-        if (!cancelled) setSettings(data);
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: SiteSettingsDTO | null) => {
+        if (!cancelled && data) setSettings(data);
       })
-      .catch((e) => {
-        console.warn("Failed to fetch site settings:", e);
+      .catch(() => {
+        // Backend offline or unreachable — silently fall back
       })
       .finally(() => {
         if (!cancelled) setLoaded(true);

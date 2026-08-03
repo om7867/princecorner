@@ -54,11 +54,11 @@ export function SettingsEditor() {
         the restaurant&apos;s name, look, and offers in seconds.
       </p>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
       <div className="max-w-2xl">
       <div className="rounded-3xl border border-linen/10 bg-[#221913] p-6">
-        <h2 className="font-display text-xl italic text-linen">Identity</h2>
-        <p className="mt-1 text-xs text-linen/50">The name, tagline, and colors used across the site.</p>
+        <h2 className="font-display text-xl italic text-linen">Identity &amp; Branding</h2>
+        <p className="mt-1 text-xs text-linen/50">The restaurant name, tagline, story text, and colors used across the site.</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="s-name" className={labelClasses}>
@@ -79,6 +79,19 @@ export function SettingsEditor() {
               id="s-tagline"
               value={form.tagline ?? ""}
               onChange={(e) => set("tagline", e.target.value)}
+              className={inputClasses}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="s-desc" className={labelClasses}>
+              Story &amp; Description Words
+            </label>
+            <textarea
+              id="s-desc"
+              rows={3}
+              value={form.description ?? ""}
+              onChange={(e) => set("description", e.target.value)}
+              placeholder="Describe your restaurant's story, specialties, and atmosphere..."
               className={inputClasses}
             />
           </div>
@@ -115,7 +128,7 @@ export function SettingsEditor() {
               type="color"
               value={form.primary_color ?? "#e7a73a"}
               onChange={(e) => set("primary_color", e.target.value)}
-              className="mt-1 h-11 w-full rounded-xl border border-linen/15 bg-espresso/40"
+              className="mt-1 h-11 w-full rounded-xl border border-linen/15 bg-espresso/40 cursor-pointer"
             />
           </div>
           <div>
@@ -127,7 +140,7 @@ export function SettingsEditor() {
               type="color"
               value={form.accent_color ?? "#c1652f"}
               onChange={(e) => set("accent_color", e.target.value)}
-              className="mt-1 h-11 w-full rounded-xl border border-linen/15 bg-espresso/40"
+              className="mt-1 h-11 w-full rounded-xl border border-linen/15 bg-espresso/40 cursor-pointer"
             />
           </div>
         </div>

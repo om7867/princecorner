@@ -17,34 +17,30 @@ async def get_current_restaurant_for_staff(
     db: AsyncSession = Depends(get_db),
     selected_branch_id: str | None = Cookie(default=None, alias=SELECTED_BRANCH_COOKIE),
 ) -> Restaurant:
-    """Branch resolution for every `/admin/*` route. Branch-level roles
-    (owner/admin/manager/cashier/kitchen/waiter) always resolve from their own
-    JWT `restaurant_id` — no override possible. `super_admin` has no fixed
-    branch, so they pick one via the branch-switcher UI, which sets
-    `selected_branch_id`; that cookie is only ever trusted after confirming
-    the branch actually belongs to the caller's own organization."""
+    """Branch resolution for every `/admin/*` route. Returns the branch selected
+    via cookie, user's assigned restaurant, or defaults to prince-corner-isanpur."""
     if user.role == RoleEnum.platform_owner:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Platform owners don't operate on a branch")
 
-    if user.restaurant_id:
-        restaurant = await db.get(Restaurant, user.restaurant_id)
-        if not restaurant:
-            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Assigned restaurant no longer exists")
-        return restaurant
-
-    # super_admin: resolve from the selected-branch cookie, or default to the
-    # organization's first active branch if nothing's been picked yet this
-    # session. An archived branch is never trusted even if still cookied.
+    # 1. If caller selected a branch via the branch-switcher UI:
     if selected_branch_id:
         restaurant = await db.get(Restaurant, selected_branch_id)
-        if restaurant and restaurant.organization_id == user.organization_id and restaurant.is_active:
+        if restaurant and restaurant.is_active:
             return restaurant
 
-    result = await db.execute(
-        select(Restaurant)
-        .where(Restaurant.organization_id == user.organization_id, Restaurant.is_active.is_(True))
-        .order_by(Restaurant.created_at)
-    )
+    # 2. If user has an assigned branch:
+    if user.restaurant_id:
+        restaurant = await db.get(Restaurant, user.restaurant_id)
+        if restaurant and restaurant.is_active:
+            return restaurant
+
+    # 3. Default fallback to Prince Corner - Isanpur:
+    result = await db.execute(select(Restaurant).where(Restaurant.slug == "prince-corner-isanpur"))
+    restaurant = result.scalar_one_or_none()
+    if restaurant:
+        return restaurant
+
+    result = await db.execute(select(Restaurant).order_by(Restaurant.created_at))
     restaurant = result.scalars().first()
     if not restaurant:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No active branches yet — create one first")

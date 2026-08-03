@@ -8,7 +8,7 @@ import { CrownIcon } from "./CrownIcon";
  * crown badge on the right edge of every page (except its own). */
 export function PrinceCornerBadge() {
   const pathname = usePathname();
-  if (pathname.startsWith("/prince-corner")) return null;
+  if (pathname.startsWith("/prince-corner") || pathname.startsWith("/order") || pathname.startsWith("/track")) return null;
 
   return (
     <Link

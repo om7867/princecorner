@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prince Corner — Image Downloader</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: #e8e6e1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+  h1 { font-size: 28px; margin-bottom: 8px; }
+  h1 span { color: #ff7a3d; }
+  .sub { color: #888; font-size: 14px; margin-bottom: 30px; }
+  .btn { background: #ff7a3d; color: #fff; border: none; padding: 16px 40px; font-size: 18px; font-weight: 700; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+  .btn:hover { background: #ff9a5d; transform: scale(1.03); }
+  .btn:disabled { background: #333; cursor: not-allowed; transform: none; }
+  #progress { margin-top: 24px; font-size: 14px; color: #999; max-width: 600px; text-align: center; }
+  .bar-wrap { width: 400px; height: 8px; background: #222; border-radius: 4px; margin-top: 14px; overflow: hidden; display: none; }
+  .bar { height: 100%; background: linear-gradient(90deg, #ff7a3d, #ffaa6d); width: 0%; transition: width 0.3s; border-radius: 4px; }
+  .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 30px; max-width: 800px; width: 100%; }
+  .preview-grid img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; border: 1px solid #222; }
+  .label { font-size: 12px; color: #ff7a3d; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 30px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Download All <span>Prince Corner</span> Images</h1>
+<p class="sub">20 food/ambience photos + 17 menu photos → one ZIP file</p>
+
+<button class="btn" id="downloadBtn" onclick="downloadAll()">⬇️ Download All 37 Images as ZIP</button>
+
+<div id="progress"></div>
+<div class="bar-wrap" id="barWrap"><div class="bar" id="bar"></div></div>
+
+<div class="label" id="previewLabel" style="display:none;">Preview (loading from Google...)</div>
+<div class="preview-grid" id="previewGrid"></div>
+
+<script>
+const foodPhotos = [
+  {url: "https://lh3.googleusercontent.com/HdTwhG95AG1kgHP8swXAqM0ECr4kUUtDMGzSsZPLeecl38CvZ1pdxf9EDwDtl_qfq_km2AS6D_BRu_INrg5o-z0jn8s=w800-rw", name: "food_01.jpg"},
+  {url: "https://lh3.googleusercontent.com/QA91C6ANldtqxYOg-5aa0i18BWkOAx4xKkOWDSW2DaE2IdBSTAA6qFNjB1bp3hqmxeShOVdDoOex6lDG9CezzWtP85wF=w800-rw", name: "food_02.jpg"},
+  {url: "https://lh3.googleusercontent.com/tGFlF65hyVEQo07NtEDQiFi_CpN0VT1Fu-m6Z87kqqqdtW_2ecFaPT7blNYCmlkPF85EANetN0ViP36faMTkaBc4bUuS87ICcMAedcc=w800-rw", name: "food_03.jpg"},
+  {url: "https://lh3.googleusercontent.com/YQgoSj9ahgW7HNQHrzr9x6c3onbGbnENgMCZSkHVUZw_yJ4aP3SBY-12l6es4ztwWeBt9SajBWWRxoKyndTt4nSbIciK1KBiunrcalM=w800-rw", name: "food_04.jpg"},
+  {url: "https://lh3.googleusercontent.com/YNRTzuir3Pr-0hrzhIGQmmo__jC_LvQUz8lSZrSf24dK64DeWnxb_yv5R4gqENeekODxmt6iV3p_MIN2nzQe3o6WsO9XmACFsvf-Gv9mFQ=w800-rw", name: "food_05.jpg"},
+  {url: "https://lh3.googleusercontent.com/jMW9W2oMKGUUEf4wbCPs19boi7hxlkw3Otz9DMkcO_XziYOQ-E1X1be8_kzTlrk0K-QmSgZ_OsNXslb7db4Z_6OTr282xfg6BAGu6G1b=w800-rw", name: "food_06.jpg"},
+  {url: "https://lh3.googleusercontent.com/YHdFiCvZP5H6yNjNLeRmkMEOQXf99nQR3fXDXMRImrFaDhJoCvlndkuTx5Eub9B0H6M4nhRHRGiKbShjrjfOWM-UAN5vHeJ1qyxg-qM=w800-rw", name: "food_07.jpg"},
+  {url: "https://lh3.googleusercontent.com/eCNvn72dH3tRpW26mluK213HLSxRXMbndbkMgywFA94fK4AgAJEk-MP47-LAUEUxiHkVyhGiR5vVrpfu8RIX-IJm05T6-fQRxnrrN6g=w800-rw", name: "food_08.jpg"},
+  {url: "https://lh3.googleusercontent.com/JUOIK4U_G0eb61y1nKp551pgygqX_q30YM-RhhBKd1M3yo7zFO31JPw-rEfHZBuM_Bm9xNqmw18aPfWHN-um3T6bZh2oz4cc4CHoumqG=w800-rw", name: "food_09.jpg"},
+  {url: "https://lh3.googleusercontent.com/aLpQ4aLpPsWDhfUgttKeCsZvkxTGi_F1FYs8v35dQ-SdLjM06ON3AicxT5xAZOtiM4KEO6tiPoEpAF44rwl0AZacY0Cs2xr9u796Imhh=w800-rw", name: "food_10.jpg"},
+  {url: "https://lh3.googleusercontent.com/SuQBj4-dO_crC8MfR0enQyWWb5Ie4iN81pwGc4lnD2bhrxsjyHQvbSoEqoTR9YzsFwLFRvug1s6lCdoRM8ek5BYjSgim57HeOtjcLqI=w800-rw", name: "food_11.jpg"},
+  {url: "https://lh3.googleusercontent.com/FbW4EmOJlqi9Ed--03ttqv3ydK2iPm3Len6y5kwgs_o8q3XvFr03EfLWlQVBTkIE8oYcx-Vib_cW32OQIjbEiaU_ldFY3DjE63XGO-LL=w800-rw", name: "food_12.jpg"},
+  {url: "https://lh3.googleusercontent.com/HBjzxHB4caNNgASybUVBIm1kD_j33S49Tv8NYNPJE2xprILdtY9vDGDGPDK38VCDTailB50dwWVBqUIYf5PTs8vXZ5e3ryrAqsTrAYBzmQ=w800-rw", name: "food_13.jpg"},
+  {url: "https://lh3.googleusercontent.com/AF2VgbAe7GkZM6Gvf2RcUjjeQQFeeBC1PbE_nTzt9XlZx3b18Cf1WYBS6CqMBbGjRcfq5U7WXXJL3VbzxG4GYEy1r_1K1qZb3mUS8sY=w800-rw", name: "food_14.jpg"},
+  {url: "https://lh3.googleusercontent.com/7YMDj-ZOziKXUY4DkmNtnq7i2u468NX5pPvASGbqTEfzf543iq_rJ3hQIMe0T9mhUCn8d_C970icK9dv4Nop_9vUWc4_jgz4yqdjP3E=w800-rw", name: "food_15.jpg"},
+  {url: "https://lh3.googleusercontent.com/vW4KYi_x-3DWix7jrfHu3y45MJh8DDwv18HBfweerNTaD2N4kBzDtEIAO4t0kwd6PHOUZVpwGKAa9d3cC73iEdM6c2aP8jm_lSOoSUef=w800-rw", name: "food_16.jpg"},
+  {url: "https://lh3.googleusercontent.com/vWw8qh8GDgq_GFktR3u9Ix3wKN_6p_A7i-tO19gyutFq8TjxWDrBSRz2jZAo7uora0lbnzl1V2P48Y9SL15SDann2Mmfwu9ZP0JefaxQLQ=w800-rw", name: "food_17.jpg"},
+  {url: "https://lh3.googleusercontent.com/ubU0v4aJs0g8N4TyqRdSCJix9TIHB8xVOVjJYJN9sr1VINFasy1F8SE9VdgatwlDm883ekDBCgqTG4KZ2nnAfKSO0cZfBvztn9pgYtwxLw=w800-rw", name: "food_18.jpg"},
+  {url: "https://lh3.googleusercontent.com/sEu_D-LFggFWqGVlfmD3sqMKFrxx3DspmzbYArYSLWV0FqWrhBbh7P2sMRxeTrrr3_dB1NlUGNZf3edWbGtjU_a9jL6MYQ8k9LQwSYUh=w800-rw", name: "food_19.jpg"},
+  {url: "https://lh3.googleusercontent.com/hVq1fLloMwc5IxrZJBQjwplB_-EnHEnJAHbC5C2SSx8EjLkaqUMLY7uzLK1cb41LfM50X8f0pQuO8p1M2lpB3cWmjHWpQm2vohMbJSk=w800-rw", name: "food_20.jpg"},
+  {url: "https://lh3.googleusercontent.com/8gFCbAFbaxuYFNSyDflAF4E4Ea51z2oegjl4X4Y3quXCq_N_SjTSbNidZsR05Tjg0brlPY6Rggty0JXycmp1gI9Xr7SAWG0jQ-2hXjkl=w1600-rw", name: "storefront_hero.jpg"},
+];
+
+const menuPhotos = [
+  {url: "https://lh3.googleusercontent.com/zTjOmeYVrFRnxoTDWQLMTSfG3Ur--cSjqRHpNa2cXHBuHld68KBDpsvwMU3Az0CXsaX8IlP4przFSwYakzIbJyZFxA=w800-rw", name: "menu_01.jpg"},
+  {url: "https://lh3.googleusercontent.com/Q3QRmZt9Zw3Hll4nUwiKtDrwxBdqHZlLi1xb2-Yw8XFpn4AelbaRVYr2oOgkd2WI87GHLENZDQ0aqDBt2iF1Ccswg_w=w800-rw", name: "menu_02.jpg"},
+  {url: "https://lh3.googleusercontent.com/tO8FKsU0KY9qfXOrnD_cc7r3dBkE-VBUo55lUtmZa3edFWUQQNZo0bR04-QcrXR9THJ2rgVp2cENr7leLMIcmOBLAT2j=w800-rw", name: "menu_03.jpg"},
+  {url: "https://lh3.googleusercontent.com/495Nz5DKj8bCz974gfG6XH2vmYXJ1KIVu5UDhPgZsQKxRaN33BAqfsbnivGbvuWhVfD1MJewxQKpUvO2UOxrEz0ByK22=w800-rw", name: "menu_04.jpg"},
+  {url: "https://lh3.googleusercontent.com/-SRRGD3P_qgyZklJiGHM6HftaguYZLZhYKGyXy7UxWytiL9-4BmpEJWcSQYVxVWghXyeTaTnsnWe6EGwlFfQcMPshw=w800-rw", name: "menu_05.jpg"},
+  {url: "https://lh3.googleusercontent.com/QmoLCHN75nA85Z7oJBsLeY4WGsd4jt0QjJoQrYK6IfOVN2wU1HGuzbrqVXvpjGW0vg4xKpNKDw6aWSNgEJkJ45QzhQQ=w800-rw", name: "menu_06.jpg"},
+  {url: "https://lh3.googleusercontent.com/VzQ5u3nydnFcK4ywJt55FLX19nD4jm3FuIuaj6zMYwiVmv04yawGD79Q-NnoyURznZABx2jFyqmu9RkkGAgFOJK8mQ=w800-rw", name: "menu_07.jpg"},
+  {url: "https://lh3.googleusercontent.com/9LdbGcWIGFdIkZxmBc6ZokS_w142JtLlEOgWGTqlfb75wt1vbjLZfwDocpOoHvJecWlv6ZagI7Ctds2Yg1Vaj6zwPw0=w800-rw", name: "menu_08.jpg"},
+  {url: "https://lh3.googleusercontent.com/3OL913mgXkC4Bo6Mm_Uy6882xSJt5_otCq7N0VrTUqZmfGS1lYoahT4yNQ5ji1qqDQFdA8CnwWfN6uP2nd_QZJjf7x4=w800-rw", name: "menu_09.jpg"},
+  {url: "https://lh3.googleusercontent.com/CpkKN1_q_qrXqld5K1VSYkqxqeGTD0WLwQJe-YeYYTfY_GEaMbeUlVSyWKGeK-MZtJGWnRzcf8P1bAggRR-w1vfrDyo=w800-rw", name: "menu_10.jpg"},
+  {url: "https://lh3.googleusercontent.com/YgKohLsTD2uOp6sT8OQ__Z5jCn86ge9dygBF4eta0OxSDEb9qcjGmKUaVSd7jq-IAqLIPsejVVh_szBCccIu4b8cEaW2g97YBemjZ3YbSQ=w800-rw", name: "menu_11.jpg"},
+  {url: "https://lh3.googleusercontent.com/GagJqvwjFR4pp9eJNdDWfL4XuDTYuVe0iqqsaLMpx6QEBQ03gOyuMXvi_cAoTVWU2bA_lsQhRDR_vIR4DkPLr3Sh4CAagnCmkPMm0fYBAw=w800-rw", name: "menu_12.jpg"},
+  {url: "https://lh3.googleusercontent.com/MQRLnXmNGJsYsgGblGOJnNzps4OYRVsaDFkgJJhoCmF3zYMBZZFFLMTf7br-TOGqdOjMos9mR1gqr8WYeYu3dAEz5is8XvHqtJmKf-85bQ=w800-rw", name: "menu_13.jpg"},
+  {url: "https://lh3.googleusercontent.com/8dR1Xrwg_dGg2hM7MyzFwwRQUSmndUppKj6_eCmxDD6b1ytvuoaHPweVVOn0S_C9QP4VQ7t1sPFP9mXYl8iRDpxXR8uctW2xhvPSBoJoOA=w800-rw", name: "menu_14.jpg"},
+  {url: "https://lh3.googleusercontent.com/gZh3h26XfC8lvpL4UR2SigRQ0kvxnX9PTh-CvwdgknLvbzZnf5rr2KzQ1mhpTaQr_KRMqyEoWpu6se48TlgNUeHGuoOwxS5h_J8utFw=w800-rw", name: "menu_15.jpg"},
+  {url: "https://lh3.googleusercontent.com/ukDmQWV4Y83unqj5yhkFgAXhi40zSUxfyXg--A-IkUkeQlGJyfYV1Bjkq9C6o986oJ7yYJRVARYC_-qyd3NP0QQwShgF02CUTHazoJYY=w800-rw", name: "menu_16.jpg"},
+  {url: "https://lh3.googleusercontent.com/yZwAGIBu2xoHqnfuv_kpksFUrSYRaeqSVzsEXoacQEYHBZ0b4_DAzFw6fPj2ReSsumOrGj8JTnQgCiwCHdyDay1W_t2Ju1oPZrCwqacz=w800-rw", name: "menu_17.jpg"},
+];
+
+const allImages = [
+  ...foodPhotos.map(p => ({...p, folder: "food-photos"})),
+  ...menuPhotos.map(p => ({...p, folder: "menu-photos"})),
+];
+
+// Show previews on load
+window.onload = function() {
+  document.getElementById('previewLabel').style.display = 'block';
+  const grid = document.getElementById('previewGrid');
+  allImages.forEach(img => {
+    const el = document.createElement('img');
+    el.src = img.url;
+    el.alt = img.name;
+    el.loading = "lazy";
+    grid.appendChild(el);
+  });
+};
+
+async function downloadAll() {
+  const btn = document.getElementById('downloadBtn');
+  const progress = document.getElementById('progress');
+  const barWrap = document.getElementById('barWrap');
+  const bar = document.getElementById('bar');
+  
+  btn.disabled = true;
+  btn.textContent = "⏳ Downloading...";
+  barWrap.style.display = 'block';
+  
+  const zip = new JSZip();
+  const foodFolder = zip.folder("food-photos");
+  const menuFolder = zip.folder("menu-photos");
+  
+  let done = 0;
+  const total = allImages.length;
+  
+  const downloadImage = async (img) => {
+    try {
+      const response = await fetch(img.url);
+      const blob = await response.blob();
+      const folder = img.folder === "food-photos" ? foodFolder : menuFolder;
+      folder.file(img.name, blob);
+      done++;
+      bar.style.width = ((done / total) * 100) + '%';
+      progress.textContent = `Downloaded ${done}/${total}: ${img.name}`;
+    } catch (e) {
+      done++;
+      progress.textContent = `⚠️ Failed: ${img.name} — continuing...`;
+    }
+  };
+  
+  // Download in batches of 5
+  for (let i = 0; i < allImages.length; i += 5) {
+    const batch = allImages.slice(i, i + 5);
+    await Promise.all(batch.map(downloadImage));
+  }
+  
+  progress.textContent = "📦 Creating ZIP file...";
+  
+  const content = await zip.generateAsync({type: "blob"}, (metadata) => {
+    bar.style.width = metadata.percent.toFixed(0) + '%';
+  });
+  
+  saveAs(content, "prince-corner-images.zip");
+  
+  progress.textContent = "✅ Done! prince-corner-images.zip saved to your Downloads folder.";
+  btn.textContent = "✅ Download Complete!";
+  btn.disabled = false;
+  btn.onclick = () => saveAs(content, "prince-corner-images.zip");
+  btn.textContent = "⬇️ Download Again";
+}
+</script>
+
+</body>
+</html>

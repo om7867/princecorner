@@ -4,28 +4,28 @@ import { Reveal } from "@/components/ui/Reveal";
 
 const GALLERY = [
   {
-    src: unsplash("1495474472287-4d71bcdd2085", 600),
-    alt: "Friends raising latte cups together at the café counter",
+    src: "/food-photos/paneer_butter_masala.jpg",
+    alt: "Butter Paneer Masala in handi",
   },
   {
-    src: unsplash("1414235077428-338989a2e8c0", 600),
-    alt: "A dish plated tableside in warm candlelight",
+    src: "/food-photos/punjabi_thali.jpg",
+    alt: "Prince Special Punjabi Thali Feast",
   },
   {
-    src: unsplash("1517433670267-08bbd4be890f", 600),
-    alt: "Bakery shelves stacked with fresh pastries",
+    src: "/food-photos/masala_dosa.jpg",
+    alt: "Golden Masala Dosa with sambar",
   },
   {
-    src: unsplash("1470337458703-46ad1756a187", 600),
-    alt: "A cocktail strained over ice at the bar",
+    src: "/food-photos/real_pav_bhaji.jpg",
+    alt: "Prince Special Pav Bhaji with buttered pav",
   },
   {
-    src: unsplash("1509440159596-0249088772ff", 600),
-    alt: "Sourdough loaves dusted with flour",
+    src: "/food-photos/hakka_noodles.jpg",
+    alt: "Wok-tossed Hakka Noodles",
   },
   {
-    src: unsplash("1551024506-0bccd828d307", 600),
-    alt: "Chocolate dessert with warm caramel pour",
+    src: "/food-photos/food_16.jpg",
+    alt: "Royal Special Falooda with kulfi",
   },
 ];
 

@@ -19,6 +19,7 @@ export function PrinceHero() {
             src="/princelogo.png" 
             alt="Prince Corner Logo" 
             fill
+            sizes="(max-width: 768px) 96px, 128px"
             className="object-cover"
             priority
           />

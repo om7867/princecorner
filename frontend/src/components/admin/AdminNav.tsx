@@ -48,20 +48,21 @@ export function AdminNav({ role }: { role: Session["role"] }) {
   const [selectedBranchId, setSelectedBranchId] = useState("");
 
   useEffect(() => {
-    if (!isSuperAdmin) return;
     let cancelled = false;
     fetch("/api/admin/org/branches")
       .then((r) => r.json())
       .then((data: BranchOption[]) => {
         if (cancelled || !Array.isArray(data)) return;
         setBranches(data);
-        setSelectedBranchId((cur) => cur || data[0]?.id || "");
+        const isanpur = data.find((b) => b.slug === "prince-corner-isanpur");
+        const defaultId = isanpur ? isanpur.id : data[0]?.id || "";
+        setSelectedBranchId((cur) => cur || defaultId);
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, [isSuperAdmin]);
+  }, []);
 
   async function switchBranch(branchId: string) {
     setSelectedBranchId(branchId);
@@ -102,12 +103,12 @@ export function AdminNav({ role }: { role: Session["role"] }) {
         <p className="text-center font-display text-xl italic text-linen sm:hidden">
           {name.charAt(0) || "•"}
         </p>
-        {isSuperAdmin && branches.length > 0 && (
+        {branches.length > 0 && (
           <select
             aria-label="Switch branch"
             value={selectedBranchId}
             onChange={(e) => switchBranch(e.target.value)}
-            className="mt-3 hidden w-full rounded-lg border border-linen/15 bg-espresso/40 px-2 py-1.5 text-xs text-linen focus:border-saffron focus:outline-none sm:block"
+            className="mt-3 hidden w-full rounded-lg border border-linen/15 bg-espresso/40 px-2 py-1.5 text-xs font-bold text-saffron focus:border-saffron focus:outline-none sm:block"
           >
             {branches.map((b) => (
               <option key={b.id} value={b.id}>
