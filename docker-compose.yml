@@ -47,7 +47,7 @@ services:
       SEED_OWNER_EMAIL: ${SEED_OWNER_EMAIL:-owner@kelviontech.in}
       SEED_OWNER_PASSWORD: ${SEED_OWNER_PASSWORD:-ChangeMe123!}
     ports:
-      - "127.0.0.1:8001:8000"
+      - "8001:8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -73,7 +73,7 @@ services:
       NEXT_PUBLIC_WS_BASE_URL: wss://restaurant.kelviontech.in
       NEXT_PUBLIC_SITE_URL: https://restaurant.kelviontech.in
     ports:
-      - "127.0.0.1:3001:3000"
+      - "3001:3000"
 
 volumes:
   postgres_data:
