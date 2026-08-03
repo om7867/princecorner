@@ -39,7 +39,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change-this-production-jwt-secret-key-2026}
       JWT_ALGORITHM: HS256
       JWT_EXPIRE_MINUTES: 480
-      CORS_ORIGINS: ${CORS_ORIGINS:-https://restaurent.kelviontech.in,http://localhost:3001,http://localhost:3000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://restaurant.kelviontech.in,http://localhost:3001,http://localhost:3000}
       ENV: production
       RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
       RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
@@ -70,8 +70,8 @@ services:
       API_BASE_URL: http://restaurant-backend:8000
       AUTH_JWT_SECRET: ${JWT_SECRET:-change-this-production-jwt-secret-key-2026}
       NEXT_PUBLIC_API_BASE_URL: /api/public
-      NEXT_PUBLIC_WS_BASE_URL: wss://restaurent.kelviontech.in
-      NEXT_PUBLIC_SITE_URL: https://restaurent.kelviontech.in
+      NEXT_PUBLIC_WS_BASE_URL: wss://restaurant.kelviontech.in
+      NEXT_PUBLIC_SITE_URL: https://restaurant.kelviontech.in
     ports:
       - "127.0.0.1:3001:3000"
 
