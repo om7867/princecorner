@@ -129,3 +129,27 @@ async def adjust_loyalty(db: AsyncSession, restaurant_id: str, phone: str, paylo
     await db.commit()
     await db.refresh(account)
     return account
+
+
+async def delete_coupon(db: AsyncSession, restaurant_id: str, coupon_id: str) -> None:
+    coupon = await db.get(Coupon, coupon_id)
+    if not coupon or coupon.restaurant_id != restaurant_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Coupon not found")
+    await db.delete(coupon)
+    await db.commit()
+
+
+async def list_all_loyalty(db: AsyncSession, restaurant_id: str) -> list[LoyaltyAccount]:
+    result = await db.execute(
+        select(LoyaltyAccount).where(LoyaltyAccount.restaurant_id == restaurant_id).order_by(LoyaltyAccount.points.desc())
+    )
+    return list(result.scalars().all())
+
+
+async def delete_loyalty(db: AsyncSession, restaurant_id: str, phone: str) -> None:
+    account = await get_loyalty_account(db, restaurant_id, phone)
+    if not account:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Loyalty account not found")
+    await db.delete(account)
+    await db.commit()
+

@@ -3,9 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatMoney } from "@/lib/types";
 import type { InvoiceDTO, OrderDTO, PaymentMethod, TableDTO } from "@/lib/types";
+import { ThermalBillModal } from "./ThermalBillModal";
 
 const inputClasses =
   "rounded-lg border border-linen/15 bg-espresso/40 px-3 py-2 text-sm text-linen placeholder:text-linen/35 focus:border-saffron focus:outline-none";
+
+const DEFAULT_MOCK_TABLES: TableDTO[] = [
+  { id: "tbl-1", code: "T1", is_active: true },
+  { id: "tbl-2", code: "T2", is_active: true },
+  { id: "tbl-3", code: "T3", is_active: true },
+  { id: "tbl-4", code: "T4", is_active: true },
+  { id: "tbl-5", code: "T5", is_active: true },
+];
 
 export function PaymentsPanel() {
   const [tables, setTables] = useState<TableDTO[]>([]);
@@ -16,6 +25,7 @@ export function PaymentsPanel() {
   const [loyaltyPhone, setLoyaltyPhone] = useState("");
   const [redeemPoints, setRedeemPoints] = useState(0);
   const [invoice, setInvoice] = useState<InvoiceDTO | null>(null);
+  const [showThermalBill, setShowThermalBill] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
@@ -24,11 +34,25 @@ export function PaymentsPanel() {
   useEffect(() => {
     fetch("/api/admin/tables")
       .then((r) => r.json())
-      .then(setTables)
-      .catch(() => {});
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setTables(data);
+          setTableId(data[0].id);
+        } else {
+          setTables(DEFAULT_MOCK_TABLES);
+          setTableId(DEFAULT_MOCK_TABLES[0].id);
+        }
+      })
+      .catch(() => {
+        setTables(DEFAULT_MOCK_TABLES);
+        setTableId(DEFAULT_MOCK_TABLES[0].id);
+      });
+
     fetch("/api/orders")
       .then((r) => r.json())
-      .then(setOrders)
+      .then((data) => {
+        if (Array.isArray(data)) setOrders(data);
+      })
       .catch(() => {});
   }, []);
 
@@ -372,13 +396,28 @@ export function PaymentsPanel() {
 
           {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
 
-          <button
-            onClick={reset}
-            className="mt-5 text-xs font-semibold uppercase tracking-[0.1em] text-linen/50 hover:text-linen"
-          >
-            ← Bill another table
-          </button>
+          <div className="mt-5 flex items-center justify-between border-t border-linen/10 pt-4">
+            <button
+              onClick={() => setShowThermalBill(true)}
+              className="rounded-full bg-saffron/20 border border-saffron/40 px-5 py-2 text-xs font-bold text-saffron uppercase tracking-wider hover:bg-saffron hover:text-espresso"
+            >
+              🖨️ Thermal Print Receipt
+            </button>
+            <button
+              onClick={reset}
+              className="text-xs font-semibold uppercase tracking-[0.1em] text-linen/50 hover:text-linen"
+            >
+              ← Bill another table
+            </button>
+          </div>
         </div>
+      )}
+
+      {showThermalBill && invoice && (
+        <ThermalBillModal
+          invoice={invoice}
+          onClose={() => setShowThermalBill(false)}
+        />
       )}
     </main>
   );

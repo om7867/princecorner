@@ -32,11 +32,21 @@ async def admin_list_reservations(
     return await reservations_service.list_reservations(db, restaurant.id)
 
 
-@admin_router.patch("/reservations/{reservation_id}", response_model=ReservationRead)
-async def admin_update_reservation(
-    reservation_id: str,
-    payload: ReservationStatusUpdate,
+@admin_router.post("/reservations", response_model=ReservationRead)
+async def admin_create_reservation(
+    payload: ReservationCreate,
     db: AsyncSession = Depends(get_db),
     restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
 ) -> ReservationRead:
-    return await reservations_service.update_reservation_status(db, restaurant.id, reservation_id, payload.status)
+    return await reservations_service.create_reservation(db, restaurant.id, payload)
+
+
+@admin_router.delete("/reservations/{reservation_id}")
+async def admin_delete_reservation(
+    reservation_id: str,
+    db: AsyncSession = Depends(get_db),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
+):
+    await reservations_service.delete_reservation(db, restaurant.id, reservation_id)
+    return {"status": "deleted"}
+

@@ -248,6 +248,17 @@ export function StaffPanel() {
               >
                 Reset
               </button>
+              <button
+                onClick={async () => {
+                  if (!window.confirm(`Delete staff member ${member.name}?`)) return;
+                  const res = await fetch(`${staffEndpoint()}/${member.id}`, { method: "DELETE" });
+                  if (res.ok) load();
+                }}
+                className="rounded-full border border-linen/15 px-3 py-1 text-xs text-linen/50 hover:border-red-400 hover:text-red-400"
+                title="Delete staff"
+              >
+                🗑️
+              </button>
             </div>
           </div>
         ))}

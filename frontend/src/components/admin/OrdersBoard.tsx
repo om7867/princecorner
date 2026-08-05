@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { PUBLIC_WS_BASE_URL } from "@/lib/env";
 import { formatMoney } from "@/lib/types";
 import type { OrderDTO, OrderStatus } from "@/lib/types";
+import { POSModal } from "./POSModal";
+import { ThermalBillModal } from "./ThermalBillModal";
 
 const COLUMNS: { id: OrderStatus; label: string; action?: string; next?: OrderStatus }[] = [
   { id: "received", label: "New", action: "Start preparing", next: "preparing" },
@@ -123,19 +125,36 @@ export function OrdersBoard({ heading = "Live orders" }: { heading?: string }) {
   }
 
   const activeCount = orders.filter((o) => o.status !== "served" && o.status !== "cancelled").length;
+  const [posOpen, setPosOpen] = useState(false);
+  const [selectedOrderForBill, setSelectedOrderForBill] = useState<OrderDTO | null>(null);
+
+  function reloadOrders() {
+    fetch("/api/orders")
+      .then((r) => r.json())
+      .then((data) => setOrders(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }
 
   return (
     <main aria-label={heading}>
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl italic text-linen">{heading}</h1>
           <p className="mt-1 text-sm text-linen/50">
             Orders from table QR codes appear here instantly — no refresh needed.
           </p>
         </div>
-        <span className="rounded-full bg-saffron/15 px-4 py-1.5 font-body text-sm font-semibold text-saffron">
-          {activeCount} active
-        </span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setPosOpen(true)}
+            className="flex items-center gap-2 rounded-full bg-saffron px-5 py-2.5 font-body text-sm font-bold uppercase tracking-wider text-espresso shadow-lg transition-transform hover:scale-105"
+          >
+            🖥️ Open POS Terminal
+          </button>
+          <span className="rounded-full bg-saffron/15 px-4 py-2 font-body text-sm font-semibold text-saffron">
+            {activeCount} active
+          </span>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -157,8 +176,7 @@ export function OrdersBoard({ heading = "Live orders" }: { heading?: string }) {
         <div className="mt-16 rounded-3xl border border-dashed border-linen/15 p-12 text-center">
           <p className="font-display text-xl italic text-linen/70">No orders yet</p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-linen/40">
-            Open the guest ordering page from “Table QR Codes”, place a test
-            order, and watch it land here in real time.
+            Open the POS terminal to place a walk-in order or scan a table QR code.
           </p>
         </div>
       )}
@@ -214,22 +232,41 @@ export function OrdersBoard({ heading = "Live orders" }: { heading?: string }) {
                       <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-linen/30">
                         {order.display_code} · {formatMoney(order.total)}
                       </p>
-                      {column.action && column.next && (
-                        <button
-                          onClick={() => advance(order, column.next!)}
-                          className="mt-3 w-full rounded-full bg-saffron py-2.5 font-body text-sm font-semibold text-espresso transition-transform active:scale-[0.98]"
-                        >
-                          {column.action}
-                        </button>
-                      )}
-                      {column.id !== "served" && (
-                        <button
-                          onClick={() => cancelOrder(order)}
-                          className="mt-2 w-full rounded-full border border-red-500/30 py-2 font-body text-xs font-semibold uppercase tracking-[0.1em] text-red-400/80 transition-colors hover:border-red-500/60 hover:text-red-400"
-                        >
-                          Cancel order
-                        </button>
-                      )}
+                      
+                      <div className="mt-3 space-y-1.5">
+                        {column.action && column.next && (
+                          <button
+                            onClick={() => advance(order, column.next!)}
+                            className="w-full rounded-full bg-saffron py-2.5 font-body text-sm font-semibold text-espresso transition-transform active:scale-[0.98]"
+                          >
+                            {column.action}
+                          </button>
+                        )}
+                        
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <button
+                            onClick={() => setSelectedOrderForBill(order)}
+                            className="rounded-full border border-linen/20 py-2 font-body text-[11px] font-semibold uppercase tracking-wider text-linen transition-colors hover:border-saffron hover:text-saffron flex items-center justify-center gap-1"
+                          >
+                            🖨️ Print Bill
+                          </button>
+                          <button
+                            onClick={() => setSelectedOrderForBill(order)}
+                            className="rounded-full border border-emerald-500/40 bg-emerald-950/30 py-2 font-body text-[11px] font-semibold uppercase tracking-wider text-emerald-400 transition-colors hover:border-emerald-500 hover:bg-emerald-900/50 flex items-center justify-center gap-1"
+                          >
+                            📱 WhatsApp E-Bill
+                          </button>
+                        </div>
+
+                        {column.id !== "served" && (
+                          <button
+                            onClick={() => cancelOrder(order)}
+                            className="w-full rounded-full border border-red-500/30 py-2 font-body text-xs font-semibold uppercase tracking-[0.1em] text-red-400/80 transition-colors hover:border-red-500/60 hover:text-red-400"
+                          >
+                            Cancel order
+                          </button>
+                        )}
+                      </div>
                     </article>
                   );
                 })}
@@ -238,6 +275,36 @@ export function OrdersBoard({ heading = "Live orders" }: { heading?: string }) {
           );
         })}
       </div>
+
+      {posOpen && (
+        <POSModal
+          onClose={() => setPosOpen(false)}
+          onOrderCreated={reloadOrders}
+        />
+      )}
+
+      {selectedOrderForBill && (
+        <ThermalBillModal
+          billData={{
+            displayCode: selectedOrderForBill.display_code,
+            tableCode: selectedOrderForBill.table_code,
+            channel: selectedOrderForBill.channel === "dine_in" ? "Dine-In" : "Takeaway / Online",
+            createdAt: selectedOrderForBill.created_at,
+            cashierName: "Head Cashier",
+            items: selectedOrderForBill.items.map((i) => ({
+              name: i.name_snapshot,
+              quantity: i.quantity,
+              unitPrice: i.unit_price_snapshot,
+              lineTotal: i.line_total,
+            })),
+            subtotal: selectedOrderForBill.total,
+            taxAmount: Number(selectedOrderForBill.total) * 0.05,
+            total: Number(selectedOrderForBill.total) * 1.05,
+            paymentMethod: "CASH",
+          }}
+          onClose={() => setSelectedOrderForBill(null)}
+        />
+      )}
     </main>
   );
 }

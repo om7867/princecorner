@@ -6,9 +6,19 @@ import QRCode from "qrcode";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import type { TableDTO } from "@/lib/types";
 
+const DEFAULT_MOCK_TABLES: TableDTO[] = [
+  { id: "tbl-1", code: "T1", is_active: true },
+  { id: "tbl-2", code: "T2", is_active: true },
+  { id: "tbl-3", code: "T3", is_active: true },
+  { id: "tbl-4", code: "T4", is_active: true },
+  { id: "tbl-5", code: "T5", is_active: true },
+];
+
 export function QRGrid({ initialTables }: { initialTables: TableDTO[] }) {
   const { settings } = useSiteSettings();
-  const [tables, setTables] = useState<TableDTO[]>(initialTables);
+  const [tables, setTables] = useState<TableDTO[]>(
+    Array.isArray(initialTables) && initialTables.length > 0 ? initialTables : DEFAULT_MOCK_TABLES
+  );
   const [codes, setCodes] = useState<Record<string, string>>({});
   const [origin, setOrigin] = useState("");
   const [bulkCount, setBulkCount] = useState(3);

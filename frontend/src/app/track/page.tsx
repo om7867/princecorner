@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/types";
 import type { OrderDTO, OrderStatus } from "@/lib/types";
 import { SiteNavbar } from "@/components/ui/SiteNavbar";
 import { LocationFooter } from "@/components/sections/LocationFooter";
+import { ThermalBillModal, openStandaloneEbillPrintWindow } from "@/components/admin/ThermalBillModal";
 
 const STATUS_STEPS: { id: OrderStatus; label: string; desc: string; icon: string }[] = [
   { id: "received", label: "Order Received", desc: "Your order has reached our kitchen.", icon: "📝" },
@@ -27,73 +28,89 @@ function OrderTrackerContent() {
   const [allOrders, setAllOrders] = useState<OrderDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showEbillModal, setShowEbillModal] = useState(false);
 
   // Fetch order by ID or load all local/server orders
   const loadOrders = useCallback(async () => {
     setLoading(true);
     setError(null);
 
-    // 1. Gather saved local order IDs from browser localStorage
-    let savedIds: string[] = [];
-    try {
-      const ids1: string[] = JSON.parse(localStorage.getItem("guest-orders-ONLINE") ?? "[]");
-      const keys = Object.keys(localStorage).filter((k) => k.startsWith("guest-orders-"));
-      keys.forEach((k) => {
-        try {
-          const parsed = JSON.parse(localStorage.getItem(k) ?? "[]");
-          if (Array.isArray(parsed)) savedIds.push(...parsed);
-        } catch {}
-      });
-      savedIds = Array.from(new Set(savedIds));
-    } catch {}
+    const cleanQuery = queryId.trim().toLowerCase().replace(/^(ord-|pc-)/, "");
 
-    try {
-      // Fetch all public orders from server
-      const res = await fetch(`${PUBLIC_API_BASE_URL}/orders`);
-      let serverOrders: OrderDTO[] = [];
-      if (res.ok) {
-        serverOrders = await res.json();
+    // 1. Direct fetch by ID if queryId is present in URL ?id=...
+    if (queryId) {
+      try {
+        const directRes = await fetch(`${PUBLIC_API_BASE_URL}/orders/${encodeURIComponent(queryId)}`);
+        if (directRes.ok) {
+          const directOrder: OrderDTO = await directRes.json();
+          if (directOrder && (directOrder.id || directOrder.display_code)) {
+            setActiveOrder(directOrder);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {
+        /* continue to list fetch */
       }
+    }
 
-      // Filter or find matching order
-      if (Array.isArray(serverOrders) && serverOrders.length > 0) {
-        setAllOrders(serverOrders);
-
-        if (queryId) {
-          const target = serverOrders.find(
-            (o) =>
-              o.id.toLowerCase() === queryId.toLowerCase() ||
-              o.display_code.toLowerCase() === queryId.toLowerCase()
-          );
-          if (target) {
-            setActiveOrder(target);
-            setLoading(false);
-            return;
-          }
-        }
-
-        // If saved IDs exist, find the latest matching order
-        if (savedIds.length > 0) {
-          const myMatched = serverOrders.filter((o) => savedIds.includes(o.id));
-          if (myMatched.length > 0) {
-            setActiveOrder(myMatched[0]);
-            setLoading(false);
-            return;
-          }
-        }
-
-        // Fallback to first active server order
-        setActiveOrder(serverOrders[0]);
-      } else {
-        // If server returned no orders, construct from localStorage saved orders
-        setAllOrders([]);
-        setActiveOrder(null);
+    // 2. Fetch all orders from /api/orders (admin & mock fallback endpoint)
+    let fetchedOrders: OrderDTO[] = [];
+    try {
+      const res = await fetch("/api/orders");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) fetchedOrders = data;
       }
     } catch {
-      setError("Unable to connect to server. Showing cached order status.");
-    } finally {
-      setLoading(false);
+      /* ignore */
     }
+
+    // 3. If empty, try fetching public orders
+    if (fetchedOrders.length === 0) {
+      try {
+        const publicRes = await fetch(`${PUBLIC_API_BASE_URL}/orders`);
+        if (publicRes.ok) {
+          const publicData = await publicRes.json();
+          if (Array.isArray(publicData)) fetchedOrders = publicData;
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+
+    if (fetchedOrders.length > 0) {
+      setAllOrders(fetchedOrders);
+
+      // Match queryId if present
+      if (queryId) {
+        const matched = fetchedOrders.find((o) => {
+          const cleanId = o.id.toLowerCase().replace(/^ord-/, "");
+          const cleanCode = o.display_code.toLowerCase().replace(/^pc-/, "");
+          return (
+            cleanId === cleanQuery ||
+            cleanCode === cleanQuery ||
+            o.id.toLowerCase() === queryId.trim().toLowerCase() ||
+            o.display_code.toLowerCase() === queryId.trim().toLowerCase() ||
+            cleanId.includes(cleanQuery) ||
+            cleanQuery.includes(cleanId)
+          );
+        });
+
+        if (matched) {
+          setActiveOrder(matched);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // If no queryId match, default to first order
+      setActiveOrder(fetchedOrders[0]);
+    } else {
+      setAllOrders([]);
+      setActiveOrder(null);
+    }
+    setLoading(false);
   }, [queryId]);
 
   useEffect(() => {
@@ -316,9 +333,36 @@ function OrderTrackerContent() {
 
               {/* Action Buttons */}
               <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeOrder) {
+                      openStandaloneEbillPrintWindow({
+                        displayCode: activeOrder.display_code,
+                        tableCode: activeOrder.table_code,
+                        channel: activeOrder.channel === "dine_in" ? "Dine-In" : "Takeaway / Online",
+                        createdAt: activeOrder.created_at,
+                        cashierName: "Head Cashier",
+                        items: activeOrder.items.map((i) => ({
+                          name: i.name_snapshot,
+                          quantity: i.quantity,
+                          unitPrice: i.unit_price_snapshot,
+                          lineTotal: i.line_total,
+                        })),
+                        subtotal: activeOrder.total,
+                        taxAmount: Number(activeOrder.total) * 0.05,
+                        total: Number(activeOrder.total) * 1.05,
+                        paymentMethod: "PAID",
+                      });
+                    }
+                  }}
+                  className="flex-1 rounded-full bg-saffron px-6 py-3 font-body text-xs font-bold uppercase tracking-widest text-espresso shadow-lg transition-transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                >
+                  📄 Download PDF Bill / E-Receipt
+                </button>
                 <Link
                   href="/order?table=ONLINE&r=prince-corner-isanpur"
-                  className="flex-1 rounded-full bg-saffron px-6 py-3 text-center font-body text-xs font-bold uppercase tracking-widest text-espresso shadow-lg transition-transform hover:scale-105 active:scale-95"
+                  className="rounded-full border border-white/20 bg-white/5 px-6 py-3 font-body text-xs font-bold uppercase tracking-widest text-linen hover:bg-white/10 transition-colors"
                 >
                   🍲 Order More Items
                 </Link>
@@ -347,44 +391,6 @@ function OrderTrackerContent() {
             >
               Browse Menu &amp; Place Order ➔
             </Link>
-          </div>
-        )}
-
-        {/* List of Previous Session Orders */}
-        {allOrders.length > 1 && (
-          <div className="mt-12 border-t border-white/10 pt-8">
-            <h3 className="font-body text-xs font-bold uppercase tracking-[0.25em] text-linen/50 mb-4">
-              All Recent Orders ({allOrders.length})
-            </h3>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {allOrders.map((ord) => (
-                <button
-                  key={ord.id}
-                  onClick={() => setActiveOrder(ord)}
-                  className={`rounded-2xl border p-4 text-left transition-all ${
-                    activeOrder?.id === ord.id
-                      ? "border-saffron bg-saffron/15 shadow-md"
-                      : "border-white/10 bg-[#14100b]/50 hover:border-white/30"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-body text-xs font-bold text-saffron uppercase tracking-widest">
-                      {ord.display_code}
-                    </span>
-                    <span className="text-[10px] font-bold uppercase text-linen/50">
-                      {ord.status}
-                    </span>
-                  </div>
-                  <p className="text-xs text-linen/70 truncate">
-                    {ord.items.map((i) => `${i.quantity}x ${i.name_snapshot}`).join(", ")}
-                  </p>
-                  <span className="mt-2 block font-body text-xs font-semibold text-linen">
-                    {formatMoney(ord.total)}
-                  </span>
-                </button>
-              ))}
-            </div>
           </div>
         )}
 

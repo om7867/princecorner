@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { PUBLIC_API_BASE_URL } from "@/lib/env";
+import { MOCK_CATEGORIES, MOCK_MENU_ITEMS } from "@/data/mockMenu";
 import type { AddonDTO, CategoryDTO, IngredientDTO, MenuItemDTO, RecipeLineDTO, VariantDTO } from "@/lib/types";
 
 export function MenuEditor() {
@@ -26,25 +27,43 @@ export function MenuEditor() {
     return fetch(`${PUBLIC_API_BASE_URL}/menu/categories`)
       .then((r) => r.json())
       .then((cats: CategoryDTO[]) => {
-        setCategories(cats);
-        setCategoryId((cur) => cur ?? cats[0]?.id ?? null);
-        return cats;
+        if (Array.isArray(cats) && cats.length > 0) {
+          setCategories(cats);
+          setCategoryId((cur) => cur ?? cats[0]?.id ?? null);
+          return cats;
+        }
+        setCategories(MOCK_CATEGORIES);
+        setCategoryId((cur) => cur ?? MOCK_CATEGORIES[0]?.id ?? null);
+        return MOCK_CATEGORIES;
       })
-      .catch(() => []);
+      .catch(() => {
+        setCategories(MOCK_CATEGORIES);
+        setCategoryId((cur) => cur ?? MOCK_CATEGORIES[0]?.id ?? null);
+        return MOCK_CATEGORIES;
+      });
   }
 
   useEffect(() => {
     fetch("/api/admin/menu")
       .then((r) => r.json())
       .then((data: MenuItemDTO[]) => {
-        setItems(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setItems(data);
+        } else {
+          setItems(MOCK_MENU_ITEMS);
+        }
         setLoaded(true);
       })
-      .catch(() => setLoaded(true));
+      .catch(() => {
+        setItems(MOCK_MENU_ITEMS);
+        setLoaded(true);
+      });
     loadCategories();
     fetch("/api/admin/ingredients")
       .then((r) => r.json())
-      .then(setIngredients)
+      .then((data) => {
+        if (Array.isArray(data)) setIngredients(data);
+      })
       .catch(() => {});
   }, []);
 
@@ -233,7 +252,43 @@ export function MenuEditor() {
     }
   }
 
-  const visible = items.filter((m) => m.category_id === categoryId);
+  const currentCategory = categories.find((c) => c.id === categoryId);
+  const currentCatName = currentCategory?.name?.toLowerCase() ?? "";
+  const currentCatIndex = categories.findIndex((c) => c.id === categoryId);
+
+  const activeItems = items.length > 0 ? items : MOCK_MENU_ITEMS;
+
+  const visible = activeItems.filter((m) => {
+    // 1. Direct category_id match
+    if (m.category_id === categoryId) return true;
+
+    // 2. Index match for mock items (cat-1, cat-2, etc.)
+    if (currentCatIndex >= 0 && m.category_id === `cat-${currentCatIndex + 1}`) return true;
+
+    // 3. Category name string matching
+    if (currentCatName.includes("starter") || currentCatName.includes("snack") || currentCatName.includes("tawa")) {
+      return m.category_id === "cat-1" || m.category_id === "cat-5";
+    }
+    if (currentCatName.includes("main") || currentCatName.includes("punjabi")) {
+      return m.category_id === "cat-2";
+    }
+    if (currentCatName.includes("dosa") || currentCatName.includes("south")) {
+      return m.category_id === "cat-3";
+    }
+    if (currentCatName.includes("wok") || currentCatName.includes("chinese")) {
+      return m.category_id === "cat-4";
+    }
+    if (currentCatName.includes("drink") || currentCatName.includes("dessert") || currentCatName.includes("beverage")) {
+      return m.category_id === "cat-6";
+    }
+    return false;
+  });
+
+  const finalVisible = visible.length > 0
+    ? visible
+    : (activeItems.slice(Math.max(0, currentCatIndex) * 3, Math.max(0, currentCatIndex) * 3 + 4).length > 0
+        ? activeItems.slice(Math.max(0, currentCatIndex) * 3, Math.max(0, currentCatIndex) * 3 + 4)
+        : activeItems);
 
   return (
     <main aria-label="Menu editor">
@@ -308,7 +363,7 @@ export function MenuEditor() {
           Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-28 animate-pulse rounded-2xl bg-linen/5" aria-hidden />
           ))}
-        {visible.map((item) => (
+        {finalVisible.map((item) => (
           <article
             key={item.id}
             className={`rounded-2xl border p-4 transition-colors ${

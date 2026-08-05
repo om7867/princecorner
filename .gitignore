@@ -55,3 +55,7 @@ backend/__pycache__/
 *.pyc
 backend/dev.db
 backend/*.db
+
+# media files / assets exceeding git size limits
+*.mp4
+

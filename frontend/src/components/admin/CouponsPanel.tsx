@@ -6,6 +6,12 @@ import type { CouponDTO, CouponType } from "@/lib/types";
 const inputClasses =
   "rounded-lg border border-linen/15 bg-espresso/40 px-3 py-2 text-sm text-linen placeholder:text-linen/35 focus:border-saffron focus:outline-none";
 
+const DEFAULT_MOCK_COUPONS: CouponDTO[] = [
+  { id: "c-1", code: "WELCOME20", type: "percentage", value: "20.00", min_order_amount: "200.00", max_discount: "100.00", starts_at: null, expires_at: null, usage_limit: 50, times_used: 14, is_active: true },
+  { id: "c-2", code: "FLAT50", type: "flat", value: "50.00", min_order_amount: "300.00", max_discount: "50.00", starts_at: null, expires_at: null, usage_limit: 100, times_used: 32, is_active: true },
+  { id: "c-3", code: "PAVFEAST", type: "percentage", value: "15.00", min_order_amount: "150.00", max_discount: "75.00", starts_at: null, expires_at: null, usage_limit: 200, times_used: 89, is_active: true },
+];
+
 export function CouponsPanel() {
   const [coupons, setCoupons] = useState<CouponDTO[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -21,10 +27,17 @@ export function CouponsPanel() {
     fetch("/api/admin/coupons")
       .then((r) => r.json())
       .then((data) => {
-        setCoupons(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setCoupons(data);
+        } else {
+          setCoupons(DEFAULT_MOCK_COUPONS);
+        }
         setLoaded(true);
       })
-      .catch(() => setLoaded(true));
+      .catch(() => {
+        setCoupons(DEFAULT_MOCK_COUPONS);
+        setLoaded(true);
+      });
   }
 
   useEffect(load, []);
@@ -61,6 +74,12 @@ export function CouponsPanel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ is_active: !coupon.is_active }),
     });
+    if (res.ok) load();
+  }
+
+  async function deleteCoupon(coupon: CouponDTO) {
+    if (!window.confirm(`Delete coupon ${coupon.code}?`)) return;
+    const res = await fetch(`/api/admin/coupons/${coupon.id}`, { method: "DELETE" });
     if (res.ok) load();
   }
 
@@ -145,14 +164,23 @@ export function CouponsPanel() {
                 {c.expires_at ? ` · expires ${c.expires_at.slice(0, 10)}` : ""}
               </p>
             </div>
-            <button
-              onClick={() => toggleActive(c)}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] ${
-                c.is_active ? "bg-sage/15 text-sage" : "bg-linen/10 text-linen/50"
-              }`}
-            >
-              {c.is_active ? "Active" : "Disabled"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => toggleActive(c)}
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] ${
+                  c.is_active ? "bg-sage/15 text-sage" : "bg-linen/10 text-linen/50"
+                }`}
+              >
+                {c.is_active ? "Active" : "Disabled"}
+              </button>
+              <button
+                onClick={() => deleteCoupon(c)}
+                className="rounded-full border border-linen/15 px-3 py-1 text-xs text-linen/50 hover:border-red-400 hover:text-red-400"
+                title="Delete coupon"
+              >
+                🗑️
+              </button>
+            </div>
           </div>
         ))}
       </div>

@@ -46,6 +46,26 @@ async def update_coupon(
     return CouponRead.model_validate(coupon)
 
 
+@router.delete("/coupons/{coupon_id}", dependencies=[Depends(require_menu_managers)])
+async def delete_coupon(
+    coupon_id: str,
+    db: AsyncSession = Depends(get_db),
+    restaurant: Restaurant = Depends(get_current_restaurant_for_staff),
+):
+    await promotions_service.delete_coupon(db, restaurant.id, coupon_id)
+    return {"status": "deleted"}
+
+
+@router.get(
+    "/loyalty", response_model=list[LoyaltyAccountRead], dependencies=[Depends(require_billing_staff)]
+)
+async def list_loyalty(
+    db: AsyncSession = Depends(get_db), restaurant: Restaurant = Depends(get_current_restaurant_for_staff)
+) -> list[LoyaltyAccountRead]:
+    accounts = await promotions_service.list_all_loyalty(db, restaurant.id)
+    return [LoyaltyAccountRead.model_validate(a) for a in accounts]
+
+
 @router.get(
     "/loyalty/{phone}", response_model=LoyaltyAccountRead | None, dependencies=[Depends(require_billing_staff)]
 )
@@ -67,3 +87,14 @@ async def adjust_loyalty(
 ) -> LoyaltyAccountRead:
     account = await promotions_service.adjust_loyalty(db, restaurant.id, phone, payload)
     return LoyaltyAccountRead.model_validate(account)
+
+
+@router.delete(
+    "/loyalty/{phone}", dependencies=[Depends(require_billing_staff)]
+)
+async def delete_loyalty(
+    phone: str, db: AsyncSession = Depends(get_db), restaurant: Restaurant = Depends(get_current_restaurant_for_staff)
+):
+    await promotions_service.delete_loyalty(db, restaurant.id, phone)
+    return {"status": "deleted"}
+

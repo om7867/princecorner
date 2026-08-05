@@ -5,7 +5,10 @@ const BACKEND_URL = process.env.API_BASE_URL || "http://127.0.0.1:8000";
 
 async function proxyRequest(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const resolvedParams = await params;
-  const path = resolvedParams.path ? resolvedParams.path.join("/") : "";
+  let path = resolvedParams.path ? resolvedParams.path.join("/") : "";
+  if (path === "categories") {
+    path = "menu/categories";
+  }
   const search = request.nextUrl.search;
   const targetUrl = `${BACKEND_URL}/${path}${search}`;
 

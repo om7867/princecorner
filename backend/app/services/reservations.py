@@ -57,3 +57,12 @@ async def update_reservation_status(
     await db.commit()
     await db.refresh(reservation)
     return reservation
+
+
+async def delete_reservation(db: AsyncSession, restaurant_id: str, reservation_id: str) -> None:
+    reservation = await db.get(Reservation, reservation_id)
+    if not reservation or reservation.restaurant_id != restaurant_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Reservation not found")
+    await db.delete(reservation)
+    await db.commit()
+
