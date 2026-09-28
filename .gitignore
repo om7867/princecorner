@@ -34,6 +34,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+!.env.production.example
 !backend/.env.example
 !frontend/.env.local.example
 
@@ -59,3 +60,4 @@ backend/*.db
 # media files / assets exceeding git size limits
 *.mp4
 
+CREDENTIALS_LOCAL.md
